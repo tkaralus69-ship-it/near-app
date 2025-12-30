@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Near</title>
 
-  <!-- Firebase -->
-  <script type="module" src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js"></script>
-
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -19,12 +15,13 @@
     <input id="email" type="email" placeholder="Email" />
     <input id="password" type="password" placeholder="Password" />
 
-    <button id="loginBtn">Log in</button>
-    <button id="signupBtn">Sign up</button>
+    <button id="login">Log in</button>
+    <button id="signup">Sign up</button>
 
-    <p id="status"></p>
+    <p id="message"></p>
   </div>
 
+  <!-- IMPORTANT: module -->
   <script type="module" src="script.js"></script>
 </body>
 </html>
