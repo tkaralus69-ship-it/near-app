@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NEAR – App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA2ApGkST41s9U53GQIatv4FL8aCPVzeAM",
+      authDomain: "near-c7681.firebaseapp.com",
+      projectId: "near-c7681",
+      storageBucket: "near-c7681.appspot.com",
+      messagingSenderId: "316318833624",
+      appId: "1:316318833624:web:480beb2c1909e23d1cf0ad"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <script src="app.js" defer></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 60px;
+    }
+    #card {
+      max-width: 360px;
+      margin: auto;
+      padding: 24px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    button {
+      padding: 8px 16px;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>NEAR</h1>
+
+  <div id="card">
+    <p>Logged in as:</p>
+    <strong id="user-email"></strong>
+
+    <p style="margin-top:20px;">🚀 App content will go here</p>
+
+    <button onclick="logout()">Logout</button>
+  </div>
+
+</body>
+</html>
