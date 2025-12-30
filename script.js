@@ -1,4 +1,3 @@
-// Firebase v9 modular imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
   getAuth,
@@ -6,7 +5,7 @@ import {
   signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-// Firebase config (yours)
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyA2ApGkST41s9U53GQIatv4FL8aCPVzeAM",
   authDomain: "near-c7681.firebaseapp.com",
@@ -20,39 +19,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Elements
+// Get elements
 const email = document.getElementById("email");
 const password = document.getElementById("password");
 const loginBtn = document.getElementById("login");
 const signupBtn = document.getElementById("signup");
-const message = document.getElementById("message");
 
 // Sign up
-signupBtn.addEventListener("click", async () => {
-  message.textContent = "Creating account...";
-  try {
-    await createUserWithEmailAndPassword(
-      auth,
-      email.value,
-      password.value
-    );
-    message.textContent = "Account created ✅";
-  } catch (err) {
-    message.textContent = err.message;
-  }
-});
+signupBtn.onclick = async () => {
+  await createUserWithEmailAndPassword(auth, email.value, password.value);
+  window.location.href = "dashboard.html";
+};
 
 // Log in
-loginBtn.addEventListener("click", async () => {
-  message.textContent = "Logging in...";
-  try {
-    await signInWithEmailAndPassword(
-      auth,
-      email.value,
-      password.value
-    );
-    message.textContent = "Logged in ✅";
-  } catch (err) {
-    message.textContent = err.message;
-  }
-});
+loginBtn.onclick = async () => {
+  await signInWithEmailAndPassword(auth, email.value, password.value);
+  window.location.href = "dashboard.html";
+};
