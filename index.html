@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NEAR – App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+</head>
+<body>
+
+  <h1>NEAR</h1>
+
+  <p>Logged in as: <strong id="user-email"></strong></p>
+
+  <div id="card" style="margin-top:20px; padding:16px; border:1px solid #ccc;">
+    <h3>Welcome to NEAR</h3>
+    <p>📍 App content will go here</p>
+  </div>
+
+  <br />
+  <button onclick="logout()">Logout</button>
+
+  <script>
+    // 🔥 Firebase config — KEEP YOUR REAL VALUES
+    var firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>
