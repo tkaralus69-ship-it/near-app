@@ -6,3 +6,4 @@ const firebaseConfig = {
   messagingSenderId: "316318833624",
   appId: "1:316318833624:web:480beb2c1909e23d1cf0ad"
 };
+console.log("NEAR script loaded");
