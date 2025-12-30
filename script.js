@@ -1,9 +1,10 @@
-// F// Firebase imports (ONE version only)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+// Firebase imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth,
-  createUserWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -22,6 +23,7 @@ const auth = getAuth(app);
 // Button logic
 document.addEventListener("DOMContentLoaded", () => {
   const signupBtn = document.getElementById("signupBtn");
+  const loginBtn = document.getElementById("loginBtn");
 
   signupBtn.addEventListener("click", async () => {
     const email = prompt("Enter email:");
@@ -35,6 +37,25 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       alert("Sign up successful!");
+      window.location.href = "home.html";
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+
+  loginBtn.addEventListener("click", async () => {
+    const email = prompt("Enter email:");
+    const password = prompt("Enter password:");
+
+    if (!email || !password) {
+      alert("Email and password required");
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("Login successful!");
+      window.location.href = "home.html";
     } catch (error) {
       alert(error.message);
     }
