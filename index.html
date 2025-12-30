@@ -1,23 +1,35 @@
-<!<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>NEAR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEAR</title>
 </head>
-<body>
 
+<body>
   <h1>NEAR</h1>
   <p>Connect with what's near you.</p>
 
-  <input type="email" id="email" placeholder="Email" />
+  <input
+    type="email"
+    id="email"
+    placeholder="Email"
+    autocomplete="username"
+  />
   <br /><br />
-  <input type="password" id="password" placeholder="Password" />
+
+  <input
+    type="password"
+    id="password"
+    placeholder="Password"
+    autocomplete="current-password"
+  />
   <br /><br />
 
   <button id="signupBtn">Sign Up</button>
   <button id="loginBtn">Log In</button>
 
-  <script type="module" src="index.js"></script>
+  <!-- IMPORTANT: script at bottom, no module -->
+  <script src="./script.js"></script>
 </body>
 </html>
