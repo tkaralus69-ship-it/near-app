@@ -19,29 +19,28 @@ const auth = getAuth(app);
 
 // Button logic
 document.addEventListener("DOMContentLoaded", () => {
+  const signupBtn = document.getElementById("signupBtn");
 
-  document.getElementById("signupBtn").addEventListener("click", () => {
-    const email = prompt("Enter email");
-    const password = prompt("Enter password");
+  signupBtn.addEventListener("click", async () => {
+    const email = prompt("Enter email:");
+    const password = prompt("Enter password:");
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => alert("Account created 🎉"))
-      .catch(error => alert(error.message));
-  });
+    if (!email || !password) {
+      alert("Email and password required");
+      return;
+    }
 
-  document.getElementById("loginBtn").addEventListener("click", () => {
-    const email = prompt("Enter email");
-    const password = prompt("Enter password");
-
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => alert("Logged in ✅"))
-      .catch(error => alert(error.message));
-  });
-
-});
-  });
-
-  document.getElementById("loginBtn").addEventListener("click", function () {
-    );
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      alert("Sign up successful!");
+      console.log(userCredential.user);
+    } catch (error) {
+      alert(error.message);
+      console.error(error);
+    }
   });
 });
