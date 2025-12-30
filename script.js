@@ -1,10 +1,10 @@
 // Firebase imports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -20,11 +20,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// DOM ready
+// Wait for page to load
 document.addEventListener("DOMContentLoaded", () => {
   const signupBtn = document.getElementById("signupBtn");
   const loginBtn = document.getElementById("loginBtn");
 
+  // SIGN UP
   signupBtn.addEventListener("click", async () => {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
@@ -32,11 +33,13 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       alert("Sign up successful!");
+      window.location.href = "dashboard.html";
     } catch (error) {
       alert(error.message);
     }
   });
 
+  // LOG IN
   loginBtn.addEventListener("click", async () => {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
