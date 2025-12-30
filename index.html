@@ -2,34 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NEAR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Near</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: #111827;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    #message {
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
 </head>
-
 <body>
-  <h1>NEAR</h1>
-  <p>Connect with what's near you.</p>
 
-  <input
-    type="email"
-    id="email"
-    placeholder="Email"
-    autocomplete="username"
-  />
-  <br /><br />
+  <div class="box">
+    <h2>Near</h2>
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
+    <button onclick="login()">Enter</button>
+    <div id="message"></div>
+  </div>
 
-  <input
-    type="password"
-    id="password"
-    placeholder="Password"
-    autocomplete="current-password"
-  />
-  <br /><br />
-
-  <button id="signupBtn">Sign Up</button>
-  <button id="loginBtn">Log In</button>
-
-  <!-- IMPORTANT: script at bottom, no module -->
-  <script src="./script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
