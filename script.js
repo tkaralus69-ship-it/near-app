@@ -1,61 +1,49 @@
 // Firebase imports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  signInWithEmailAndPassword,
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyA2ApGkST41s9U53GQIatv4FL8aCPVzeAM",
   authDomain: "near-c7681.firebaseapp.com",
   projectId: "near-c7681",
-  storageBucket: "near-c7681.firebasestorage.app",
+  storageBucket: "near-c7681.appspot.com",
   messagingSenderId: "316318833624",
   appId: "1:316318833624:web:480beb2c1909e23d1cf0ad"
 };
 
-// Initialize Firebase
+// Init Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Button logic
+// DOM ready
 document.addEventListener("DOMContentLoaded", () => {
   const signupBtn = document.getElementById("signupBtn");
   const loginBtn = document.getElementById("loginBtn");
 
   signupBtn.addEventListener("click", async () => {
-    const email = prompt("Enter email:");
-    const password = prompt("Enter password:");
-
-    if (!email || !password) {
-      alert("Email and password required");
-      return;
-    }
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       alert("Sign up successful!");
-      window.location.href = "home.html";
     } catch (error) {
       alert(error.message);
     }
   });
 
   loginBtn.addEventListener("click", async () => {
-    const email = prompt("Enter email:");
-    const password = prompt("Enter password:");
-
-    if (!email || !password) {
-      alert("Email and password required");
-      return;
-    }
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      alert("Login successful!");
-      window.location.href = "home.html";
+      window.location.href = "dashboard.html";
     } catch (error) {
       alert(error.message);
     }
