@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NEAR – Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA2ApGkST41s9U53GQIatv4FL8aCPVzeAM",
+      authDomain: "near-c7681.firebaseapp.com",
+      projectId: "near-c7681",
+      storageBucket: "near-c7681.appspot.com",
+      messagingSenderId: "316318833624",
+      appId: "1:316318833624:web:480beb2c1909e23d1cf0ad"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+</head>
+
+<body>
+
+  <h1>NEAR</h1>
+
+  <input id="email" type="email" placeholder="Email"><br><br>
+  <input id="password" type="password" placeholder="Password"><br><br>
+
+  <button onclick="login()">Login</button>
+  <button onclick="signup()">Sign up</button>
+
+  <p id="status"></p>
+
+  <script src="script.js"></script>
+</body>
+</html>
