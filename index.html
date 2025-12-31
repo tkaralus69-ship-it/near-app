@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>NEAR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+header {
+  padding: 16px;
+  background: #020617;
+  text-align: center;
+  font-weight: bold;
+}
+.container { padding: 16px; }
+.card {
+  background: #020617;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+.hidden { display: none; }
+
+ul { list-style: none; padding: 0; margin: 0; }
+li {
+  background: #020617;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+.nearby-user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Chat */
+.chat {
+  height: calc(100vh - 320px);
+  overflow-y: auto;
+}
+.bubble {
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  max-width: 75%;
+  border-radius: 16px;
+}
+.me { background:#2563eb; margin-left:auto; }
+.them { background:#1e293b; }
+
+.typing {
+  font-size: 13px;
+  color: #94a3b8;
+  min-height: 18px;
+  padding: 4px 6px;
+}
+
+.input-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: #020617;
+}
+input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+}
+
+/* Vibes */
+.vibe {
+  background: #020617;
+  border: 1px solid #334155;
+  color: #e5e7eb;
+  margin: 4px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.vibe.active {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+/* Match */
+#matchOverlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, #2563eb, #020617 60%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+</style>
+</head>
+
+<body>
+<header>NEAR</header>
+
+<div class="container">
+
+  <div class="card">
+    <div id="status">Initializing…</div>
+    <div>You are <strong id="user"></strong></div>
+    <button id="quietBtn">🌿 Quiet Mode: Off</button>
+  </div>
+
+  <div class="card">
+    <h3>Your vibe</h3>
+    <div id="vibes">
+      <button class="vibe">💬 Just chatting</button>
+      <button class="vibe">🌱 Taking it slow</button>
+      <button class="vibe">☀️ Good energy</button>
+      <button class="vibe">🤍 Open to connection</button>
+      <button class="vibe">🧘 Quiet but friendly</button>
+    </div>
+  </div>
+
+  <div id="nearSection" class="card">
+    <h3>Nearby</h3>
+    <ul id="nearby"></ul>
+  </div>
+
+  <div id="chatSection" class="hidden card">
+    <h3 id="chatTitle"></h3>
+    <div id="messages" class="chat"></div>
+    <div id="typingIndicator" class="typing"></div>
+  </div>
+
+</div>
+
+<div id="inputBar" class="input-bar hidden">
+  <input id="msg" placeholder="Message…" />
+  <button id="send">Send</button>
+</div>
+
+<div id="matchOverlay" class="hidden">
+  <h1>💥 MATCH</h1>
+  <p id="matchName"></p>
+  <button id="startChatBtn">Start Chat</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc, updateDoc,
+  collection, addDoc, onSnapshot,
+  serverTimestamp, query, orderBy
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+/* Firebase */
+const firebaseConfig = {
+  apiKey: "AIzaSyA2ApGkST41s9U53GQIatv4FL8aCPVzeAM",
+  authDomain: "near-c7681.firebaseapp.com",
+  projectId: "near-c7681",
+  appId: "1:316318833624:web:480beb2c1909e23d1cf0ad"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* UI */
+const statusEl = document.getElementById("status");
+const userEl = document.getElementById("user");
+const nearbyEl = document.getElementById("nearby");
+const chatSection = document.getElementById("chatSection");
+const nearSection = document.getElementById("nearSection");
+const messagesEl = document.getElementById("messages");
+const chatTitle = document.getElementById("chatTitle");
+const inputBar = document.getElementById("inputBar");
+const msgEl = document.getElementById("msg");
+const typingEl = document.getElementById("typingIndicator");
+const quietBtn = document.getElementById("quietBtn");
+
+const matchOverlay = document.getElementById("matchOverlay");
+const matchNameEl = document.getElementById("matchName");
+const startChatBtn = document.getElementById("startChatBtn");
+
+/* State */
+let me, myName, chatId, pendingChat;
+let quietMode = false;
+let myVibes = [];
+let typingTimeout;
+
+/* Distance */
+function km(a,b,c,d){
+  const R=6371;
+  const dLat=(c-a)*Math.PI/180;
+  const dLon=(d-b)*Math.PI/180;
+  const x=Math.sin(dLat/2)**2+
+    Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+signInAnonymously(auth);
+
+onAuthStateChanged(auth, user => {
+  if (!user) return;
+  me = user;
+
+  myName = localStorage.getItem("name") || "User-" + Math.random().toString(36).slice(2,6);
+  localStorage.setItem("name", myName);
+  userEl.textContent = myName;
+
+  navigator.geolocation.watchPosition(async p => {
+    if (quietMode) {
+      statusEl.textContent = "Quiet Mode 🌙";
+      return;
+    }
+
+    const { latitude, longitude } = p.coords;
+    statusEl.textContent = "Online ✔";
+
+    await setDoc(doc(db,"users",me.uid),{
+      name: myName,
+      lat: latitude,
+      lng: longitude,
+      vibes: myVibes,
+      quiet: quietMode,
+      lastSeen: serverTimestamp()
+    },{merge:true});
+
+    onSnapshot(collection(db,"users"), snap => {
+      nearbyEl.innerHTML="";
+      let found=false;
+
+      snap.forEach(d=>{
+        if(d.id===me.uid) return;
+        const u=d.data();
+        if(u.quiet) return;
+        if(!u.lat) return;
+
+        if(km(latitude,longitude,u.lat,u.lng)<=5){
+          found=true;
+          const li=document.createElement("li");
+          li.className="nearby-user";
+          li.innerHTML=`
+            <div>
+              <strong>${u.name}</strong><br/>
+              <small>${(u.vibes||[]).join(" • ")}</small>
+            </div>
+          `;
+          const btn=document.createElement("button");
+          btn.textContent="Like";
+          btn.onclick=()=>likeUser(d.id,u.name);
+          li.appendChild(btn);
+          nearbyEl.appendChild(li);
+        }
+      });
+
+      if(!found) nearbyEl.innerHTML="<li>No nearby users yet</li>";
+    });
+  });
+});
+
+/* Quiet mode */
+quietBtn.onclick = async () => {
+  quietMode=!quietMode;
+  quietBtn.textContent = quietMode ? "🌙 Quiet Mode: On" : "🌿 Quiet Mode: Off";
+  await setDoc(doc(db,"users",me.uid),{ quiet: quietMode },{merge:true});
+};
+
+/* Vibes */
+document.querySelectorAll(".vibe").forEach(btn=>{
+  btn.onclick=async()=>{
+    const v=btn.textContent;
+    if(btn.classList.contains("active")){
+      btn.classList.remove("active");
+      myVibes=myVibes.filter(x=>x!==v);
+    } else {
+      if(myVibes.length>=3) return;
+      btn.classList.add("active");
+      myVibes.push(v);
+    }
+    await setDoc(doc(db,"users",
