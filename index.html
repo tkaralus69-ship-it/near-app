@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NEAR</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: radial-gradient(circle at top, #0b3d91, #000);
+  color: white;
+  height: 100vh;
+}
+
+#users {
+  padding: 20px;
+}
+
+.user {
+  background: rgba(255,255,255,0.08);
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+button {
+  background: #2d8cff;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+#matchOverlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, #0b3d91, #000);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden { display: none; }
+
+#chat {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+
+#messages {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.msg {
+  margin-bottom: 8px;
+  background: #222;
+  padding: 6px 10px;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+#sendRow {
+  display: flex;
+  padding: 10px;
+}
+#sendRow input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  border: none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="users"></div>
+
+<div id="matchOverlay" class="hidden">
+  <h1>💥 MATCH</h1>
+  <button id="startChat">Start Chat</button>
+</div>
+
+<div id="chat" class="hidden">
+  <div id="messages"></div>
+  <div id="sendRow">
+    <input id="msgInput" placeholder="Say hi…" />
+    <button id="sendBtn">Send</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import {
+  getAuth, signInAnonymously, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc,
+  collection, addDoc, onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+/* 🔥 YOUR FIREBASE CONFIG */
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let me = null;
+let pendingChat = null;
+let activeChatId = null;
+
+const usersEl = document.getElementById("users");
+const matchOverlay = document.getElementById("matchOverlay");
+const startChatBtn = document.getElementById("startChat");
+const chatEl = document.getElementById("chat");
+const messagesEl = document.getElementById("messages");
+const msgInput = document.getElementById("msgInput");
+const sendBtn = document.getElementById("sendBtn");
+
+/* 📍 DISTANCE */
+function distanceKm(a,b,c,d){
+  const R=6371;
+  const dLat=(c-a)*Math.PI/180;
+  const dLon=(d-b)*Math.PI/180;
+  const x=Math.sin(dLat/2)**2+
+    Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*
+    Math.sin(dLon/2)**2;
+  return 2*R*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+/* 🔐 AUTH */
+signInAnonymously(auth);
+
+onAuthStateChanged(auth, async u => {
+  if (!u) return;
+  me = u;
+
+  navigator.geolocation.watchPosition(async p => {
+    await setDoc(doc(db,"users",me.uid),{
+      lat:p.coords.latitude,
+      lon:p.coords.longitude,
+      ts:Date.now()
+    });
+  });
+
+  /* 👀 Nearby users */
+  onSnapshot(collection(db,"users"), snap => {
+    usersEl.innerHTML = "";
+    snap.forEach(d => {
+      if (d.id === me.uid) return;
+      const u = d.data();
+      const dist = distanceKm(
+        u.lat, u.lon,
+        window.myLat||u.lat,
+        window.myLon||u.lon
+      );
+      if (dist > 5) return;
+
+      const div = document.createElement("div");
+      div.className = "user";
+      div.innerHTML = `<span>Nearby user</span>`;
+      const btn = document.createElement("button");
+      btn.textContent = "Like";
+      btn.onclick = () => likeUser(d.id);
+      div.appendChild(btn);
+      usersEl.appendChild(div);
+    });
+  });
+
+  /* 💘 Incoming likes listener (FIX) */
+  onSnapshot(collection(db,"likes"), snap => {
+    snap.forEach(async d => {
+      const l = d.data();
+      if (l.to === me.uid) {
+        const reverseId = me.uid + "_" + l.from;
+        const r = await getDoc(doc(db,"likes",reverseId));
+        if (r.exists() && !pendingChat) {
+          pendingChat = { uid:l.from };
+          matchOverlay.classList.remove("hidden");
+        }
+      }
+    });
+  });
+});
+
+/* ❤️ LIKE */
+async function likeUser(uid){
+  await setDoc(doc(db,"likes",me.uid+"_"+uid),{
+    from:me.uid,to:uid
+  });
+
+  const reverse = await getDoc(doc(db,"likes",uid+"_"+me.uid));
+  if (reverse.exists()){
+    pendingChat = { uid };
+    matchOverlay.classList.remove("hidden");
+  }
+}
+
+/* 💬 CHAT */
+startChatBtn.onclick = () => {
+  if (!pendingChat) return;
+  matchOverlay.classList.add("hidden");
+  openChat(me.uid,pendingChat.uid);
+};
+
+function openChat(a,b){
+  activeChatId = [a,b].sort().join("_");
+  chatEl.classList.remove("hidden");
+  messagesEl.innerHTML = "";
+
+  onSnapshot(collection(db,"chats",activeChatId,"messages"), snap => {
+    messagesEl.innerHTML="";
+    snap.forEach(m=>{
+      const div=document.createElement("div");
+      div.className="msg";
+      div.textContent=m.data().text;
+      messagesEl.appendChild(div);
+    });
+  });
+}
+
+sendBtn.onclick = async () => {
+  if (!msgInput.value) return;
+  await addDoc(collection(db,"chats",activeChatId,"messages"),{
+    text:msgInput.value,
+    ts:Date.now()
+  });
+  msgInput.value="";
+};
+</script>
+
+</body>
+</html>
