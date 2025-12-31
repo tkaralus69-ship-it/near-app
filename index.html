@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: linear-gradient(180deg, #050b1a, #020617);
+      color: #fff;
+    }
+
+    header {
+      padding: 16px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .status {
+      margin: 12px;
+      padding: 10px;
+      background: #1e90ff;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .user {
+      margin: 12px;
+      padding: 14px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+    }
+
+    .distance {
+      opacity: 0.7;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>📍 Near</header>
+  <div id="status" class="status">Getting location…</div>
+  <div id="users"></div>
+
+  <script type="module" src="./script.js"></script>
+</body>
+</html>
