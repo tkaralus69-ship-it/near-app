@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NEAR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #status {
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .ok {
+      color: green;
+    }
+    .warn {
+      color: orange;
+    }
+    .error {
+      color: red;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 8px 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>NEAR</h1>
+
+  <div id="status" class="warn">Initializing…</div>
+
+  <div id="user">User: not signed in</div>
+  <div id="location">Location: unknown</div>
+
+  <h3>Nearby users (within 5 km)</h3>
+  <ul id="nearby">
+    <li>Waiting for location…</li>
+  </ul>
+
+  <button id="logout">Logout</button>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
