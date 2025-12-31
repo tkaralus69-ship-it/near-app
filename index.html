@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>NEAR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+header {
+  padding: 16px;
+  background: #020617;
+  text-align: center;
+  font-weight: bold;
+}
+.container { padding: 16px; }
+.card {
+  background: #020617;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.hidden { display:none; }
+
+button {
+  background:#2563eb;
+  color:white;
+  border:none;
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:bold;
+}
+
+.nearby-user {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+
+/* PROFILE */
+.profile-img {
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#1e293b;
+  margin-bottom:8px;
+}
+.profile-card {
+  text-align:center;
+}
+.profile-card p {
+  opacity:0.85;
+  font-size:14px;
+}
+
+/* CHAT */
+.chat {
+  height: calc(100vh - 340px);
+  overflow-y:auto;
+}
+.bubble {
+  padding:10px 14px;
+  margin-bottom:8px;
+  max-width:75%;
+  border-radius:16px;
+}
+.me { background:#2563eb; margin-left:auto; }
+.them { background:#1e293b; }
+
+.meta {
+  font-size:11px;
+  opacity:0.7;
+  margin-top:4px;
+  display:flex;
+  justify-content:space-between;
+}
+
+#typingIndicator {
+  font-size:13px;
+  opacity:0.7;
+  margin-bottom:6px;
+}
+
+.input-bar {
+  position:fixed;
+  bottom:0; left:0; right:0;
+  display:flex;
+  gap:8px;
+  padding:12px;
+  background:#020617;
+}
+input, textarea {
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+}
+
+/* MATCH */
+#matchOverlay {
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at top,#2563eb,#020617 60%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+</style>
+</head>
+
+<body>
+<header>NEAR</header>
+
+<div class="container">
+
+  <!-- STATUS -->
+  <div class="card">
+    <div id="status">Initializing…</div>
+    <div>You are <strong id="user"></strong></div>
+  </div>
+
+  <!-- EDIT PROFILE -->
+  <div class="card">
+    <h3>Your Profile</h3>
+    <input id="photoInput" placeholder="Photo URL (optional)" />
+    <textarea id="bioInput" placeholder="Short bio (optional)"></textarea>
+    <button id="saveProfile">Save Profile</button>
+  </div>
+
+  <!-- NEARBY -->
+  <div id="nearSection" class="card">
+    <h3>Nearby</h3>
+    <div id="nearby"></div>
+  </div>
+
+  <!-- PROFILE VIEW -->
+  <div id="profileView" class="card hidden"></div>
+
+  <!-- CHAT -->
+  <div id="chatSection" class="card hidden">
+    <h3 id="chatTitle"></h3>
+    <div id="typingIndicator"></div>
+    <div id="messages" class="chat"></div>
+  </div>
+</div>
+
+<div id="inputBar" class="input-bar hidden">
+  <input id="msg" placeholder="Message…" />
+  <button id="send">Send</button>
+</div>
+
+<div id="matchOverlay" class="hidden">
+  <h1>💥 MATCH</h1>
+  <p id="matchName"></p>
+  <button id="startChatBtn">Start Chat</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc,
+  collection, addDoc, onSnapshot,
+  serverTimestamp, query, orderBy
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA2ApGkST41s9U53GQIatv4FL8aCPVzeAM",
+  authDomain: "near-c7681.firebaseapp.com",
+  projectId: "near-c7681",
+  appId: "1:316318833624:web:480beb2c1909e23d1cf0ad"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* UI */
+const statusEl = document.getElementById("status");
+const userEl = document.getElementById("user");
+const nearbyEl = document.getElementById("nearby");
+const profileView = document.getElementById("profileView");
+const nearSection = document.getElementById("nearSection");
+const chatSection = document.getElementById("chatSection");
+const messagesEl = document.getElementById("messages");
+const chatTitle = document.getElementById("chatTitle");
+const inputBar = document.getElementById("inputBar");
+const msgEl = document.getElementById("msg");
+const typingEl = document.getElementById("typingIndicator");
+const matchOverlay = document.getElementById("matchOverlay");
+const matchNameEl = document.getElementById("matchName");
+const startChatBtn = document.getElementById("startChatBtn");
+
+const photoInput = document.getElementById("photoInput");
+const bioInput = document.getElementById("bioInput");
+const saveProfileBtn = document.getElementById("saveProfile");
+
+/* State */
+let me, myName, chatId, pendingChat, typingTimeout;
+let otherReadTs=null;
+
+/* Helpers */
+function km(a,b,c,d){
+  const R=6371;
+  const dLat=(c-a)*Math.PI/180;
+  const dLon=(d-b)*Math.PI/180;
+  const x=Math.sin(dLat/2)**2+
+    Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+function time(ts){
+  if(!ts?.toDate) return "";
+  return ts.toDate().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+}
+
+/* Auth */
+signInAnonymously(auth);
+onAuthStateChanged(auth,user=>{
+  if(!user) return;
+  me=user;
+
+  myName=localStorage.getItem("name") ||
+    "User-"+Math.random().toString(36).slice(2,6);
+  localStorage.setItem("name",myName);
+  userEl.textContent=myName;
+
+  navigator.geolocation.watchPosition(async p=>{
+    const {latitude,longitude}=p.coords;
+    statusEl.textContent="Online ✔";
+
+    await setDoc(doc(db,"users",me.uid),{
+      name:myName,
+      lat:latitude,
+      lng:longitude,
+      lastSeen:serverTimestamp()
+    },{merge:true});
+
+    onSnapshot(collection(db,"users"),snap=>{
+      nearbyEl.innerHTML="";
+      snap.forEach(d=>{
+        if(d.id===me.uid) return;
+        const u=d.data();
+        if(km(latitude,longitude,u.lat,u.lng)<=5){
+          const row=document.createElement("div");
+          row.className="nearby-user";
+          row.innerHTML=`<strong>${u.name}</strong>`;
+          const btn=document.createElement("button");
+          btn.textContent="View";
+          btn.onclick=()=>openProfile(d.id,u);
+          row.appendChild(btn);
+          nearbyEl.appendChild(row);
+        }
+      });
+    });
+  });
+});
+
+/* Save profile */
+saveProfileBtn.onclick=async()=>{
+  await setDoc(doc(db,"users",me.uid),{
+    photo:photoInput.value.trim(),
+    bio:bioInput.value.trim()
+  },{merge:true});
+  alert("Profile saved ✔");
+};
+
+/* Profile view */
+function openProfile(uid,u){
+  nearSection.classList.add("hidden");
+  profileView.classList.remove("hidden");
+  profileView.innerHTML=`
+    <div class="profile-card">
+      <img class="profile-img" src="${u.photo||''}" />
+      <h3>${u.name}</h3>
+      <p>${u.bio||"No bio yet"}</p>
+      <button id="likeBtn">Like</button>
+      <br><br>
+      <button onclick="location.reload()">Back</button>
+    </div>
+  `;
+  document.getElementById("likeBtn").onclick=()=>likeUser(uid,u.name);
+}
+
+/* Likes / Match */
+async function likeUser(otherUid,name){
+  await setDoc(doc(db,"likes",me.uid+"_"+otherUid),{
+    from:me.uid,to:otherUid,created:serverTimestamp()
+  });
+  const rev=await getDoc(doc(db,"likes",otherUid+"_"+me.uid));
+  if(rev.exists()){
+    pendingChat={uid:otherUid,name};
+    matchNameEl.textContent=`You and ${name}`;
+    matchOverlay.classList.remove("hidden");
+  }
+}
+
+startChatBtn.onclick=()=>{
+  matchOverlay.classList.add("hidden");
+  openChat(me.uid,pendingChat.uid,pendingChat.name);
+};
+
+/* Chat */
+function openChat(a,b,name){
+  chatId=[a,b].sort().join("_");
+  chatTitle.textContent=name;
+  profileView.classList.add("hidden");
+  chatSection.classList.remove("hidden");
+  inputBar.classList.remove("hidden");
+
+  setDoc(doc(db,"chats",chatId),{
+    read:{[me.uid]:serverTimestamp()}
+  },{merge:true});
+
+  onSnapshot(doc(db,"chats",chatId),snap=>{
+    const d=snap.data();
+    const other=[a,b].find(x=>x!==me.uid);
+    otherReadTs=d?.read?.[other]||null;
+    const typing=Object.keys(d?.typing||{})
+      .find(uid=>uid!==me.uid && d.typing[uid]);
+    typingEl.textContent=typing?"Typing…":"";
+  });
+
+  const q=query(collection(db,"chats",chatId,"messages"),orderBy("created"));
+  onSnapshot(q,s=>{
+    messagesEl.innerHTML="";
+    s.forEach(d=>{
+      const m=d.data();
+      const div=document.createElement("div");
+      div.className="bubble "+(m.uid===me.uid?"me":"them");
+      div.innerHTML=`
+        <div>${m.text}</div>
+        <div class="meta">
+          <span>${time(m.created)}</span>
+          ${m.uid===me.uid?
+            `<span>${otherReadTs && otherReadTs.toMillis()>=m.created.toMillis()
+              ?"✔✔ Read":"✔ Sent"}</span>`:""}
+        </div>`;
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop=messagesEl.scrollHeight;
+    });
+  });
+}
+
+/* Typing */
+msgEl.addEventListener("input",()=>{
+  if(!chatId) return;
+  setDoc(doc(db,"chats",chatId),{typing:{[me.uid]:true}},{merge:true});
+  clearTimeout(typingTimeout);
+  typingTimeout=setTimeout(()=>{
+    setDoc(doc(db,"chats",chatId),{typing:{[me.uid]:false}},{merge:true});
+  },1200);
+});
+
+/* Send */
+document.getElementById("send").onclick=async()=>{
+  if(!msgEl.value) return;
+  await addDoc(collection(db,"chats",chatId,"messages"),{
+    uid:me.uid,text:msgEl.value,created:serverTimestamp()
+  });
+  msgEl.value="";
+};
+</script>
+</body>
+</html>
