@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>NEAR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+header {
+  padding: 16px;
+  background: #020617;
+  text-align: center;
+  font-weight: bold;
+}
+.container { padding: 16px; }
+.card {
+  background: #020617;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+ul { list-style: none; padding: 0; margin: 0; }
+li {
+  background: #020617;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+.nearby-user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+.hidden { display: none; }
+
+/* CHAT */
+.chat {
+  height: calc(100vh - 300px);
+  overflow-y: auto;
+}
+.bubble {
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  max-width: 75%;
+  border-radius: 16px;
+}
+.me { background:#2563eb; margin-left:auto; }
+.them { background:#1e293b; }
+
+.status {
+  font-size: 11px;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+
+.typing {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.input-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: #020617;
+}
+input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+}
+
+/* MATCH OVERLAY */
+#matchOverlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, #2563eb, #020617 60%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+#matchOverlay h1 {
+  font-size: 42px;
+  margin-bottom: 8px;
+}
+#matchOverlay p {
+  color: #c7d2fe;
+  margin-bottom: 20px;
+}
+</style>
+</head>
+
+<body>
+<header>NEAR</header>
+
+<div class="container">
+
+  <div class="card">
+    <div id="status">Initializing…</div>
+    <div>You are <strong id="user"></strong></div>
+  </div>
+
+  <div id="nearSection" class="card">
+    <h3>Nearby</h3>
+    <ul id="nearby"></ul>
+  </div>
+
+  <div id="chatSection" class="hidden card">
+    <h3 id="chatTitle"></h3>
+    <div id="typing" class="typing hidden"></div>
+    <div id="messages" class="chat"></div>
+  </div>
+
+</div>
+
+<div id="inputBar" class="input-bar hidden">
+  <input id="msg" placeholder="Message…" />
+  <button id="send">Send</button>
+</div>
+
+<div id="matchOverlay" class="hidden">
+  <h1>💥 MATCH</h1>
+  <p id="matchName"></p>
+  <button id="startChatBtn">Start Chat</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc,
+  collection, addDoc, onSnapshot,
+  serverTimestamp, query, orderBy
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+/* Firebase */
+const firebaseConfig = {
+  apiKey: "AIzaSyA2ApGkST41s9U53GQIatv4FL8aCPVzeAM",
+  authDomain: "near-c7681.firebaseapp.com",
+  projectId: "near-c7681",
+  appId: "1:316318833624:web:480beb2c1909e23d1cf0ad"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* UI */
+const statusEl = document.getElementById("status");
+const userEl = document.getElementById("user");
+const nearbyEl = document.getElementById("nearby");
+const chatSection = document.getElementById("chatSection");
+const nearSection = document.getElementById("nearSection");
+const messagesEl = document.getElementById("messages");
+const chatTitle = document.getElementById("chatTitle");
+const inputBar = document.getElementById("inputBar");
+const msgEl = document.getElementById("msg");
+const typingEl = document.getElementById("typing");
+
+const matchOverlay = document.getElementById("matchOverlay");
+const matchNameEl = document.getElementById("matchName");
+const startChatBtn = document.getElementById("startChatBtn");
+
+/* State */
+let me, myName, chatId, pendingChat;
+let lastRead = {};
+let typingTimeout;
+
+/* DEV MODE (single device testing) */
+const DEV_MODE = true;
+
+/* Distance */
+function km(a,b,c,d){
+  const R=6371;
+  const dLat=(c-a)*Math.PI/180;
+  const dLon=(d-b)*Math.PI/180;
+  const x=Math.sin(dLat/2)**2+
+    Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+/* Auth */
+signInAnonymously(auth);
+
+onAuthStateChanged(auth, user => {
+  if (!user) return;
+  me = user;
+
+  myName = localStorage.getItem("name") ||
+    "User-" + Math.random().toString(36).slice(2,6);
+  localStorage.setItem("name", myName);
+  userEl.textContent = myName;
+
+  navigator.geolocation.watchPosition(async p => {
+    const { latitude, longitude } = p.coords;
+    statusEl.textContent = "Online ✔";
+
+    await setDoc(doc(db,"users",me.uid),{
+      name: myName,
+      lat: latitude,
+      lng: longitude,
+      lastSeen: serverTimestamp()
+    });
+
+    onSnapshot(collection(db,"users"), snap => {
+      nearbyEl.innerHTML="";
+      snap.forEach(d=>{
+        if(d.id===me.uid) return;
+        const u=d.data();
+        if(km(latitude,longitude,u.lat,u.lng)<=5){
+          const li=document.createElement("li");
+          li.className="nearby-user";
+          li.innerHTML=`<strong>${u.name}</strong>`;
+          const btn=document.createElement("button");
+          btn.textContent="Like";
+          btn.onclick=()=>likeUser(d.id,u.name);
+          li.appendChild(btn);
+          nearbyEl.appendChild(li);
+        }
+      });
+    });
+  });
+});
+
+/* Likes */
+async function likeUser(otherUid, name){
+  await setDoc(doc(db,"likes",me.uid+"_"+otherUid),{
+    from: me.uid, to: otherUid, created: serverTimestamp()
+  });
+
+  const reverse = await getDoc(doc(db,"likes",otherUid+"_"+me.uid));
+  if (reverse.exists() || DEV_MODE) {
+    pendingChat = { uid: otherUid, name };
+    matchNameEl.textContent = `You and ${name}`;
+    matchOverlay.classList.remove("hidden");
+  }
+}
+
+startChatBtn.onclick = () => {
+  if (!pendingChat) return;
+  matchOverlay.classList.add("hidden");
+  openChat(me.uid, pendingChat.uid, pendingChat.name);
+};
+
+/* Mark read */
+function markRead(){
+  if(!chatId) return;
+  setDoc(doc(db,"chats",chatId),{
+    lastRead:{ [me.uid]: Date.now() }
+  },{ merge:true });
+}
+
+/* Chat */
+function openChat(a,b,name){
+  chatId=[a,b].sort().join("_");
+  chatTitle.textContent=name;
+  chatSection.classList.remove("hidden");
+  nearSection.classList.add("hidden");
+  inputBar.classList.remove("hidden");
+  messagesEl.innerHTML="";
+
+  markRead();
+
+  onSnapshot(doc(db,"chats",chatId), d=>{
+    const data=d.data();
+    lastRead=data?.lastRead||{};
+    if(data?.typing && data.typing.uid!==me.uid){
+      typingEl.textContent=`${data.typing.name} is typing…`;
+      typingEl.classList.remove("hidden");
+    } else {
+      typingEl.classList.add("hidden");
+    }
+  });
+
+  const q=query(collection(db,"chats",chatId,"messages"),orderBy("created"));
+  onSnapshot(q,s=>{
+    messagesEl.innerHTML="";
+    s.forEach(d=>{
+      const m=d.data();
+      const div=document.createElement("div");
+      div.className="bubble "+(m.uid===me.uid?"me":"them");
+      div.textContent=m.text;
+
+      if(m.uid===me.uid){
+        const seen=Object.values(lastRead).some(
+          t=>m.created?.toMillis && t>=m.created.toMillis()
+        );
+        const st=document.createElement("div");
+        st.className="status";
+        st.textContent=seen?"Seen":"Sent";
+        div.appendChild(st);
+      }
+
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop=messagesEl.scrollHeight;
+    });
+    markRead();
+  });
+}
+
+/* Typing */
+msgEl.addEventListener("input",()=>{
+  if(!chatId) return;
+  setDoc(doc(db,"chats",chatId),{
+    typing:{ uid:me.uid, name:myName }
+  },{ merge:true });
+
+  clearTimeout(typingTimeout);
+  typingTimeout=setTimeout(()=>{
+    setDoc(doc(db,"chats",chatId),{ typing:null },{ merge:true });
+  },1500);
+});
+
+/* Send */
+document.getElementById("send").onclick=async()=>{
+  if(!msgEl.value||!chatId) return;
+  await addDoc(collection(db,"chats",chatId,"messages"),{
+    uid:me.uid,
+    text:msgEl.value,
+    created:serverTimestamp()
+  });
+  await setDoc(doc(db,"chats",chatId),{ typing:null },{ merge:true });
+  msgEl.value="";
+};
+</script>
+</body>
+  </html>
