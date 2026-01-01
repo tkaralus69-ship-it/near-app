@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, #0b1220, #05070f);
+      color: white;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 16px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    #status {
+      margin: 12px;
+      padding: 12px;
+      background: #2bb0ff;
+      color: black;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    #users {
+      padding: 12px;
+    }
+
+    .user {
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .distance {
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    .empty {
+      opacity: 0.7;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    button {
+      margin-top: 8px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #2bb0ff;
+      color: black;
+    }
+
+    .secondary {
+      background: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    /* Modal */
+    #modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    #modal.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #0b1220;
+      border-radius: 14px;
+      padding: 20px;
+      width: 90%;
+      max-width: 420px;
+    }
+
+    .close {
+      float: right;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+<header>📍 Near</header>
+<div id="status">Searching location…</div>
+<div id="users"></div>
+
+<!-- Modal -->
+<div id="modal">
+  <div class="modal-box">
+    <span class="close" onclick="closeModal()">✕</span>
+    <h2 id="modalTitle"></h2>
+    <p id="modalBody"></p>
+    <button id="modalPrimary" class="primary"></button>
+    <button class="secondary" onclick="closeModal()">Maybe later</button>
+  </div>
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
