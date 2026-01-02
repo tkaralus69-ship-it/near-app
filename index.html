@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Near</title>
+
+  <style>
+    :root {
+      --accent: #1ea7ff;
+      --card: #161c33;
+      --card-active: #1f2a4d;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #12182e, #070b18);
+      color: #fff;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 24px 16px 140px;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 40px 0 8px;
+      font-size: 32px;
+    }
+
+    .tagline {
+      text-align: center;
+      opacity: 0.7;
+      margin-bottom: 28px;
+    }
+
+    .count {
+      text-align: center;
+      margin-bottom: 24px;
+      opacity: 0.8;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--card), #10152a);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease;
+      animation: fadeIn 0.35s ease forwards;
+    }
+
+    .card:hover {
+      transform: translateY(-1px);
+    }
+
+    .card.selected {
+      background: linear-gradient(180deg, var(--card-active), #141c38);
+      outline: 2px solid rgba(30,167,255,0.4);
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #2a3050;
+      flex-shrink: 0;
+    }
+
+    .info {
+      flex: 1;
+    }
+
+    .name {
+      font-weight: 600;
+    }
+
+    .distance {
+      font-size: 14px;
+      opacity: 0.6;
+    }
+
+    .cta {
+      position: fixed;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .cta button {
+      width: calc(100% - 32px);
+      max-width: 480px;
+      padding: 16px;
+      border-radius: 16px;
+      border: none;
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      opacity: 0.4;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .cta button.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .footer-note {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.5;
+      padding-bottom: 6px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <h1>Near</h1>
+    <div class="tagline">Real people. Near you.</div>
+
+    <div id="count" class="count">Looking around you…</div>
+    <div id="peopleList"></div>
+  </div>
+
+  <div class="cta">
+    <button id="ctaBtn">Say hello (1 message)</button>
+  </div>
+
+  <div class="footer-note">
+    You get one message before a match • Block or decline anytime
+  </div>
+
+  <script type="module">
+    const people = [
+      { name: "Sam", age: 54, distance: "600m away" },
+      { name: "Jade", age: 31, distance: "1.1km away" },
+      { name: "Michael", age: 42, distance: "300m away" },
+      { name: "Elena", age: 27, distance: "900m away" },
+      { name: "David", age: 61, distance: "1.4km away" }
+    ];
+
+    const list = document.getElementById("peopleList");
+    const count = document.getElementById("count");
+    const ctaBtn = document.getElementById("ctaBtn");
+
+    let selectedCard = null;
+    let selectedPerson = null;
+
+    count.textContent = `${people.length} people near you right now`;
+
+    people.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <div class="avatar"></div>
+        <div class="info">
+          <div class="name">${p.name}, ${p.age}</div>
+          <div class="distance">${p.distance}</div>
+        </div>
+      `;
+
+      card.addEventListener("click", () => {
+        if (selectedCard) selectedCard.classList.remove("selected");
+        card.classList.add("selected");
+        selectedCard = card;
+        selectedPerson = p;
+
+        ctaBtn.textContent = `Say hello to ${p.name} (1 message)`;
+        ctaBtn.classList.add("active");
+      });
+
+      list.appendChild(card);
+    });
+  </script>
+</body>
+</html>
