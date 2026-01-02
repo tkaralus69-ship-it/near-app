@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Near</title>
+
+  <style>
+    :root {
+      --accent: #1ea7ff;
+      --bg1: #12182e;
+      --bg2: #070b18;
+      --card1: #161c33;
+      --card2: #10152a;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, var(--bg1), var(--bg2));
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 24px 16px 140px;
+      transition: opacity 0.4s ease;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 40px 0 8px;
+      font-size: 32px;
+    }
+
+    .tagline {
+      text-align: center;
+      opacity: 0.7;
+      margin-bottom: 32px;
+    }
+
+    .count {
+      text-align: center;
+      margin-bottom: 24px;
+      opacity: 0.8;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--card1), var(--card2));
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #2a3050;
+      flex-shrink: 0;
+    }
+
+    .name {
+      font-weight: 600;
+    }
+
+    .distance {
+      font-size: 14px;
+      opacity: 0.6;
+    }
+
+    /* CTA */
+    .cta {
+      position: fixed;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .cta button {
+      width: calc(100% - 32px);
+      max-width: 480px;
+      padding: 16px;
+      border-radius: 16px;
+      border: none;
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .footer-note {
+      position: fixed;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.5;
+    }
+
+    /* MODAL */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: linear-gradient(180deg, var(--card1), var(--card2));
+      border-radius: 20px;
+      padding: 20px;
+      width: calc(100% - 40px);
+      max-width: 420px;
+      animation: pop 0.3s ease;
+    }
+
+    .modal-card h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      margin-top: 12px;
+      border-radius: 12px;
+      border: none;
+      padding: 12px;
+      font-size: 15px;
+      resize: none;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+    }
+
+    .send {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .cancel {
+      background: transparent;
+      color: #fff;
+      opacity: 0.6;
+    }
+
+    /* EXIT STATE */
+    .exit {
+      display: none;
+      text-align: center;
+      padding-top: 40vh;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- MAIN APP -->
+  <div class="app" id="app">
+    <h1>Near</h1>
+    <div class="tagline">Real people. Near you.</div>
+    <div id="count" class="count"></div>
+    <div id="peopleList"></div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <button id="helloBtn">Say hello (1 message)</button>
+  </div>
+
+  <div class="footer-note">
+    You get one message before a match • Block or decline anytime
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <h2>Say hello</h2>
+      <div style="opacity:.6;font-size:14px">
+        You get one message. Keep it kind.
+      </div>
+      <textarea id="message" placeholder="Hey — I noticed you're nearby…"></textarea>
+      <div class="modal-actions">
+        <button class="cancel" id="cancel">Cancel</button>
+        <button class="send" id="send">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXIT -->
+  <div class="exit" id="exit">
+    <h2>Message sent</h2>
+    <p style="opacity:.7">
+      If they’re interested, you’ll hear back.<br/>
+      Go live your life.
+    </p>
+  </div>
+
+  <script type="module">
+    const people = [
+      { name: "Sam", age: 54, distance: "600m away" },
+      { name: "Jade", age: 31, distance: "1.1km away" },
+      { name: "Michael", age: 42, distance: "300m away" },
+      { name: "Elena", age: 27, distance: "900m away" },
+      { name: "David", age: 61, distance: "1.4km away" }
+    ];
+
+    const list = document.getElementById("peopleList");
+    const count = document.getElementById("count");
+    const modal = document.getElementById("modal");
+    const app = document.getElementById("app");
+    const exit = document.getElementById("exit");
+
+    count.textContent = `${people.length} people near you right now`;
+
+    people.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="avatar"></div>
+        <div>
+          <div class="name">${p.name}, ${p.age}</div>
+          <div class="distance">${p.distance}</div>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+
+    document.getElementById("helloBtn").onclick = () => {
+      modal.classList.add("active");
+    };
+
+    document.getElementById("cancel").onclick = () => {
+      modal.classList.remove("active");
+    };
+
+    document.getElementById("send").onclick = () => {
+      // BACKEND STUB (ready for Firebase later)
+      const message = document.getElementById("message").value.trim();
+      if (!message) return;
+
+      modal.classList.remove("active");
+      app.style.opacity = 0;
+
+      setTimeout(() => {
+        app.style.display = "none";
+        document.querySelector(".cta").style.display = "none";
+        document.querySelector(".footer-note").style.display = "none";
+        exit.style.display = "block";
+      }, 400);
+    };
+  </script>
+
+</body>
+</html>
