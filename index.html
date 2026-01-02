@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Near</title>
+
+  <style>
+    :root {
+      --accent: #1ea7ff;
+      --card: #161c33;
+      --card-active: #1f2a4d;
+      --bg: #070b18;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #12182e, var(--bg));
+      color: #fff;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 24px 16px 140px;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 40px 0 8px;
+      font-size: 32px;
+    }
+
+    .tagline {
+      text-align: center;
+      opacity: 0.7;
+      margin-bottom: 28px;
+    }
+
+    .count {
+      text-align: center;
+      margin-bottom: 24px;
+      opacity: 0.8;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--card), #10152a);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: 0.15s ease;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .card.selected {
+      background: linear-gradient(180deg, var(--card-active), #141c38);
+      outline: 2px solid rgba(30,167,255,0.4);
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #2a3050;
+    }
+
+    .name {
+      font-weight: 600;
+    }
+
+    .distance {
+      font-size: 14px;
+      opacity: 0.6;
+    }
+
+    .cta {
+      position: fixed;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .cta button {
+      width: calc(100% - 32px);
+      max-width: 480px;
+      padding: 16px;
+      border-radius: 16px;
+      border: none;
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .cta button.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* COMPOSE OVERLAY */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(7,11,24,0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .overlay.active {
+      display: flex;
+    }
+
+    .sheet {
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(180deg, #151c35, #0e1328);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .sheet h2 {
+      margin: 0 0 6px;
+    }
+
+    .sheet p {
+      opacity: 0.6;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 90px;
+      border-radius: 12px;
+      border: none;
+      padding: 12px;
+      resize: none;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .send {
+      margin-top: 14px;
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+    }
+
+    .sent {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .sent h2 {
+      margin-bottom: 8px;
+    }
+
+    .sent p {
+      opacity: 0.6;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <h1>Near</h1>
+    <div class="tagline">Real people. Near you.</div>
+
+    <div id="count" class="count">Looking around you…</div>
+    <div id="peopleList"></div>
+  </div>
+
+  <div class="cta">
+    <button id="ctaBtn">Say hello (1 message)</button>
+  </div>
+
+  <!-- COMPOSE OVERLAY -->
+  <div id="overlay" class="overlay">
+    <div id="sheet" class="sheet"></div>
+  </div>
+
+  <script type="module">
+    const people = [
+      { name: "Sam", age: 54, distance: "600m away" },
+      { name: "Jade", age: 31, distance: "1.1km away" },
+      { name: "Michael", age: 42, distance: "300m away" },
+      { name: "Elena", age: 27, distance: "900m away" },
+      { name: "David", age: 61, distance: "1.4km away" }
+    ];
+
+    const list = document.getElementById("peopleList");
+    const count = document.getElementById("count");
+    const ctaBtn = document.getElementById("ctaBtn");
+    const overlay = document.getElementById("overlay");
+    const sheet = document.getElementById("sheet");
+
+    let selectedCard = null;
+    let selectedPerson = null;
+
+    count.textContent = `${people.length} people near you right now`;
+
+    people.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="avatar"></div>
+        <div>
+          <div class="name">${p.name}, ${p.age}</div>
+          <div class="distance">${p.distance}</div>
+        </div>
+      `;
+
+      card.onclick = () => {
+        if (selectedCard) selectedCard.classList.remove("selected");
+        card.classList.add("selected");
+        selectedCard = card;
+        selectedPerson = p;
+        ctaBtn.textContent = `Say hello to ${p.name} (1 message)`;
+        ctaBtn.classList.add("active");
+      };
+
+      list.appendChild(card);
+    });
+
+    ctaBtn.onclick = () => {
+      overlay.classList.add("active");
+      sheet.innerHTML = `
+        <h2>Message ${selectedPerson.name}</h2>
+        <p>You get one message. Make it count.</p>
+        <textarea placeholder="Say something real…"></textarea>
+        <button class="send">Send message</button>
+      `;
+
+      sheet.querySelector(".send").onclick = () => {
+        sheet.innerHTML = `
+          <div class="sent">
+            <h2>Message sent</h2>
+            <p>If they’re interested, you’ll hear back.</p>
+          </div>
+        `;
+      };
+    };
+  </script>
+</body>
+</html>
