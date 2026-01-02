@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Near</title>
+
+  <style>
+    :root {
+      --bg: #0a0f1e;
+      --card: #141a2e;
+      --muted: #8e95b2;
+      --accent: #1ea7ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #12182e, #070b18);
+      color: #fff;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 24px 16px 120px;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 40px 0 8px;
+      font-size: 32px;
+      letter-spacing: 0.5px;
+    }
+
+    .tagline {
+      text-align: center;
+      opacity: 0.7;
+      margin-bottom: 32px;
+    }
+
+    .count {
+      text-align: center;
+      margin-bottom: 24px;
+      opacity: 0.8;
+    }
+
+    .card {
+      background: linear-gradient(180deg, #161c33, #10152a);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #2a3050;
+      flex-shrink: 0;
+    }
+
+    .info {
+      flex: 1;
+    }
+
+    .name {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .distance {
+      font-size: 14px;
+      opacity: 0.6;
+    }
+
+    .cta {
+      position: fixed;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .cta button {
+      pointer-events: auto;
+      width: calc(100% - 32px);
+      max-width: 480px;
+      padding: 16px;
+      border-radius: 16px;
+      border: none;
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .footer-note {
+      position: fixed;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.5;
+    }
+
+    /* MODAL */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .modal-card {
+      width: 90%;
+      max-width: 420px;
+      background: #0f1529;
+      border-radius: 20px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .modal-card h2 {
+      margin-top: 0;
+    }
+
+    .modal-sub {
+      opacity: 0.7;
+      margin-bottom: 16px;
+      font-size: 15px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      border-radius: 14px;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      background: #1b2140;
+      color: #fff;
+      resize: none;
+    }
+
+    .modal-card button {
+      margin-top: 16px;
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+    <h1>Near</h1>
+    <div class="tagline">Real people. Near you.</div>
+
+    <div class="count" id="count">Looking around you…</div>
+
+    <!-- LIVE PEOPLE LIST -->
+    <div id="peopleList"></div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <button id="openHello">Say hello (1 message)</button>
+  </div>
+
+  <div class="footer-note">
+    You get one message before a match • Block or decline anytime
+  </div>
+
+  <!-- HELLO MODAL -->
+  <div id="helloModal" class="modal hidden">
+    <div class="modal-card">
+      <h2>Say hello</h2>
+      <div class="modal-sub">
+        One message.<br>
+        Make it kind. Make it real.
+      </div>
+
+      <textarea id="helloText" maxlength="240" placeholder="Write your message…"></textarea>
+
+      <button id="sendHello">Send hello</button>
+    </div>
+  </div>
+
+  <!-- UI LOGIC -->
+  <script>
+    const openBtn = document.getElementById("openHello");
+    const modal = document.getElementById("helloModal");
+    const sendBtn = document.getElementById("sendHello");
+
+    openBtn.onclick = () => {
+      modal.classList.remove("hidden");
+    };
+
+    sendBtn.onclick = () => {
+      const text = document.getElementById("helloText").value.trim();
+      if (!text) return;
+
+      modal.innerHTML = `
+        <div class="modal-card">
+          <h2>Message sent</h2>
+          <div class="modal-sub">
+            If they’re interested, you’ll hear back.<br><br>
+            Go live your life.
+          </div>
+        </div>
+      `;
+    };
+
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.classList.add("hidden");
+    };
+  </script>
+
+  <!-- LIVE DATA -->
+  <script type="module" src="./script.js"></script>
+
+</body>
+  </html>
