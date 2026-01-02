@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Near</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, #0b1220, #05070f);
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* HEADER */
+    header {
+      text-align: center;
+      padding: 16px 0 8px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      margin-top: 6px;
+      font-size: 14px;
+      opacity: 0.75;
+    }
+
+    /* CONTEXT */
+    .context {
+      text-align: center;
+      margin: 16px 0 20px;
+      font-size: 15px;
+      opacity: 0.85;
+    }
+
+    /* PROFILE LIST */
+    .profiles {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .profile {
+      background: rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      flex-shrink: 0;
+    }
+
+    .info {
+      flex: 1;
+    }
+
+    .name {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .meta {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    /* ACTION */
+    .action {
+      margin: 28px 0 8px;
+      text-align: center;
+    }
+
+    .action button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      background: #2bb0ff;
+      color: #000;
+    }
+
+    .action p {
+      margin-top: 8px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    /* FOOTER */
+    footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <header>
+      <h1>Near</h1>
+      <p>Real people. Near you.</p>
+    </header>
+
+    <div class="context">
+      5 people near you right now
+    </div>
+
+    <div class="profiles">
+      <div class="profile">
+        <div class="avatar"></div>
+        <div class="info">
+          <div class="name">Sam, 54</div>
+          <div class="meta">600m away</div>
+        </div>
+      </div>
+
+      <div class="profile">
+        <div class="avatar"></div>
+        <div class="info">
+          <div class="name">Jade, 31</div>
+          <div class="meta">1.1km away</div>
+        </div>
+      </div>
+
+      <div class="profile">
+        <div class="avatar"></div>
+        <div class="info">
+          <div class="name">Michael, 42</div>
+          <div class="meta">300m away</div>
+        </div>
+      </div>
+
+      <div class="profile">
+        <div class="avatar"></div>
+        <div class="info">
+          <div class="name">Elena, 27</div>
+          <div class="meta">900m away</div>
+        </div>
+      </div>
+
+      <div class="profile">
+        <div class="avatar"></div>
+        <div class="info">
+          <div class="name">David, 61</div>
+          <div class="meta">1.4km away</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action">
+      <button>Say hello (1 message)</button>
+      <p>You get one message before a match</p>
+    </div>
+
+    <footer>
+      Block or decline politely at any time
+    </footer>
+
+  </div>
+</body>
+</html>
