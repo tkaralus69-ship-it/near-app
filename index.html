@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Near</title>
+
+<style>
+:root {
+  --accent:#1ea7ff;
+}
+
+* {
+  box-sizing:border-box;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+}
+
+body {
+  margin:0;
+  background:radial-gradient(circle at top,#12182e,#070b18);
+  color:#fff;
+}
+
+.app {
+  max-width:480px;
+  margin:0 auto;
+  min-height:100vh;
+  padding:24px 16px 120px;
+}
+
+h1 {
+  text-align:center;
+  margin:40px 0 8px;
+  font-size:32px;
+}
+
+.tagline {
+  text-align:center;
+  opacity:.7;
+  margin-bottom:32px;
+}
+
+.count {
+  text-align:center;
+  margin-bottom:24px;
+  opacity:.8;
+}
+
+/* cards */
+.card {
+  background:linear-gradient(180deg,#161c33,#10152a);
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  cursor:pointer;
+  animation:fadeIn .4s ease forwards;
+}
+
+.avatar {
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:#2a3050;
+}
+
+.name {
+  font-weight:600;
+}
+.distance {
+  font-size:14px;
+  opacity:.6;
+}
+
+/* footer CTA */
+.cta {
+  position:fixed;
+  bottom:24px;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:center;
+}
+
+.cta button {
+  width:calc(100% - 32px);
+  max-width:480px;
+  padding:16px;
+  border-radius:16px;
+  border:none;
+  background:var(--accent);
+  color:#000;
+  font-weight:700;
+  font-size:16px;
+}
+
+/* screens */
+.screen {
+  display:none;
+}
+.screen.active {
+  display:block;
+}
+
+/* profile */
+.profile {
+  text-align:center;
+  padding-top:40px;
+}
+
+.profile .avatar {
+  width:96px;
+  height:96px;
+  margin:0 auto 16px;
+}
+
+.intent {
+  opacity:.7;
+  margin-bottom:24px;
+}
+
+/* chat */
+.chat-bubble {
+  background:#1a2142;
+  border-radius:16px;
+  padding:14px;
+  margin-top:24px;
+  max-width:80%;
+}
+
+.chat-note {
+  text-align:center;
+  opacity:.5;
+  margin-top:24px;
+  font-size:14px;
+}
+
+/* top bar */
+.top {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.top button {
+  background:none;
+  border:none;
+  color:#fff;
+  font-size:18px;
+}
+
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(8px);}
+  to {opacity:1; transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<!-- LIST SCREEN -->
+<div id="listScreen" class="screen active">
+  <h1>Near</h1>
+  <div class="tagline">Real people. Near you.</div>
+  <div id="count" class="count"></div>
+  <div id="peopleList"></div>
+</div>
+
+<!-- PROFILE SCREEN -->
+<div id="profileScreen" class="screen">
+  <div class="top">
+    <button onclick="goBack()">✕</button>
+  </div>
+
+  <div class="profile">
+    <div class="avatar"></div>
+    <h2 id="profileName"></h2>
+    <div id="profileDistance" class="distance"></div>
+    <div class="intent">Intent: conversation</div>
+  </div>
+
+  <div class="cta">
+    <button onclick="openChat()">Say hello (1 message)</button>
+  </div>
+</div>
+
+<!-- CHAT SCREEN -->
+<div id="chatScreen" class="screen">
+  <div class="top">
+    <button onclick="goBack()">←</button>
+    <strong>Chat</strong>
+  </div>
+
+  <div class="chat-bubble">
+    Hey — thanks for saying hello 🙂
+  </div>
+
+  <div class="chat-note">
+    You can reply once. If it flows, it continues.
+  </div>
+
+  <div class="cta">
+    <button>Send</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const people = [
+  { name:"Sam", age:54, distance:"600m away" },
+  { name:"Jade", age:31, distance:"1.1km away" },
+  { name:"Michael", age:42, distance:"300m away" },
+  { name:"Elena", age:27, distance:"900m away" },
+  { name:"David", age:61, distance:"1.4km away" }
+];
+
+const listScreen = document.getElementById("listScreen");
+const profileScreen = document.getElementById("profileScreen");
+const chatScreen = document.getElementById("chatScreen");
+
+const list = document.getElementById("peopleList");
+const count = document.getElementById("count");
+
+count.textContent = `${people.length} people near you right now`;
+
+people.forEach(p => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="avatar"></div>
+    <div>
+      <div class="name">${p.name}, ${p.age}</div>
+      <div class="distance">${p.distance}</div>
+    </div>
+  `;
+  card.onclick = () => openProfile(p);
+  list.appendChild(card);
+});
+
+function openProfile(p) {
+  listScreen.classList.remove("active");
+  profileScreen.classList.add("active");
+  document.getElementById("profileName").textContent = `${p.name}, ${p.age}`;
+  document.getElementById("profileDistance").textContent = p.distance;
+}
+
+function openChat() {
+  profileScreen.classList.remove("active");
+  chatScreen.classList.add("active");
+}
+
+function goBack() {
+  profileScreen.classList.remove("active");
+  chatScreen.classList.remove("active");
+  listScreen.classList.add("active");
+}
+</script>
+
+</body>
+</html>
