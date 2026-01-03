@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Near</title>
+
+<style>
+  :root {
+    --accent: #1ea7ff;
+    --soft: #8e95b2;
+    --danger: #ff5f5f;
+  }
+
+  * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+
+  body {
+    margin: 0;
+    background: radial-gradient(circle at top, #12182e, #070b18);
+    color: white;
+  }
+
+  .app {
+    max-width: 480px;
+    margin: auto;
+    padding: 24px 16px 120px;
+  }
+
+  h1 {
+    text-align: center;
+    margin: 32px 0 6px;
+    font-size: 34px;
+  }
+
+  .tagline {
+    text-align: center;
+    opacity: 0.7;
+    margin-bottom: 26px;
+  }
+
+  .count {
+    text-align: center;
+    margin-bottom: 20px;
+    opacity: 0.8;
+  }
+
+  .card {
+    background: linear-gradient(180deg, #161c33, #10152a);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 14px;
+    animation: fade 0.4s ease;
+  }
+
+  .top {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+
+  .avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #2a3050;
+  }
+
+  .name {
+    font-weight: 600;
+  }
+
+  .distance {
+    font-size: 14px;
+    opacity: 0.6;
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .like { background: var(--accent); color: black; }
+  .soft { background: #2a3050; color: white; }
+  .block { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+
+  .status {
+    text-align: center;
+    margin-top: 6px;
+    font-size: 14px;
+    opacity: 0.7;
+  }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <h1>Near</h1>
+  <div class="tagline">Real people. Near you.</div>
+
+  <div id="count" class="count"></div>
+  <div id="list"></div>
+</div>
+
+<script>
+const people = [
+  { name: "Sam", age: 54, distance: "600m away" },
+  { name: "Jade", age: 31, distance: "1.1km away" },
+  { name: "Michael", age: 42, distance: "300m away" },
+  { name: "Elena", age: 27, distance: "900m away" },
+  { name: "David", age: 61, distance: "1.4km away" }
+];
+
+const list = document.getElementById("list");
+const count = document.getElementById("count");
+
+count.textContent = `${people.length} people near you right now`;
+
+people.forEach(p => {
+  const card = document.createElement("div");
+  card.className = "card";
+
+  card.innerHTML = `
+    <div class="top">
+      <div class="avatar"></div>
+      <div>
+        <div class="name">${p.name}, ${p.age}</div>
+        <div class="distance">${p.distance}</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="like">Like</button>
+      <button class="soft">Not right now</button>
+      <button class="block">Block</button>
+    </div>
+
+    <div class="status"></div>
+  `;
+
+  const status = card.querySelector(".status");
+
+  card.querySelector(".like").onclick = () => {
+    status.textContent = "You liked them. If it’s mutual, you’ll hear back.";
+    removeActions();
+  };
+
+  card.querySelector(".soft").onclick = () => {
+    status.textContent = "You gently closed the door. No ghosts. No guilt.";
+    removeActions();
+  };
+
+  card.querySelector(".block").onclick = () => {
+    status.textContent = "Blocked. Your space is protected.";
+    removeActions();
+  };
+
+  function removeActions() {
+    card.querySelector(".actions").remove();
+  }
+
+  list.appendChild(card);
+});
+</script>
+
+</body>
+</html>
