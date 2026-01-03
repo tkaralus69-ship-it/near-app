@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Near</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: radial-gradient(circle at top, #121a2f, #05070f 70%);
+  color: #fff;
+  overflow-x: hidden;
+}
+
+header {
+  padding: 36px 20px 24px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 38px;
+  font-weight: 700;
+}
+
+header p {
+  margin: 6px 0 0;
+  color: #9aa3c7;
+}
+
+#count {
+  margin-top: 16px;
+  font-size: 18px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+#count.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#list {
+  padding: 8px 16px 130px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 34px rgba(0,0,0,0.35);
+
+  opacity: 0;
+  transform: translateY(18px) scale(0.98);
+  animation: appear 0.6s ease forwards;
+}
+
+@keyframes appear {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card.fade-out {
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2d3b6a, #1b2445);
+  flex-shrink: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.distance {
+  font-size: 14px;
+  color: #b6bfdc;
+  margin-top: 4px;
+}
+
+footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 18px 16px 22px;
+  background: linear-gradient(to top, rgba(5,7,15,0.96), rgba(5,7,15,0.6));
+}
+
+button {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  display: block;
+  padding: 18px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 16px;
+  border: none;
+  color: #fff;
+  background: linear-gradient(135deg, #1b8edc, #1769aa);
+  box-shadow: 0 10px 28px rgba(27,142,220,0.35);
+}
+
+.tagline {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #8e97b7;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Near</h1>
+  <p>Real people. Near you.</p>
+  <div id="count">Loading…</div>
+</header>
+
+<div id="list"></div>
+
+<footer>
+  <button>Say hello</button>
+  <div class="tagline">People come and go • Choose with intention</div>
+</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+/* 🔴 REPLACE THESE */
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+/* 🔴 END */
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const listEl = document.getElementById("list");
+const countEl = document.getElementById("count");
+
+const rendered = new Map();
+let myUid = null;
+let myLat = null;
+let myLng = null;
+
+const ACTIVE_WINDOW = 45000;
+const MAX_DISTANCE_KM = 5;
+
+function distanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2) ** 2 +
+    Math.cos(lat1 * Math.PI/180) *
+    Math.cos(lat2 * Math.PI/180) *
+    Math.sin(dLon/2) ** 2;
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
+
+signInAnonymously(auth).then(res => {
+  myUid = res.user.uid;
+  startLocation();
+  listenUsers();
+});
+
+function startLocation() {
+  navigator.geolocation.watchPosition(pos => {
+    myLat = pos.coords.latitude;
+    myLng = pos.coords.longitude;
+
+    setDoc(doc(db, "users", myUid), {
+      lat: myLat,
+      lng: myLng,
+      updatedAt: Date.now(),
+      name: "Someone"
+    }, { merge: true });
+  });
+}
+
+function listenUsers() {
+  onSnapshot(collection(db, "users"), snap => {
+    let visible = 0;
+    const now = Date.now();
+
+    snap.forEach(d => {
+      if (d.id === myUid) return;
+      const data = d.data();
+
+      if (!data.lat || !data.lng) return;
+      if (now - data.updatedAt > ACTIVE_WINDOW) {
+        removeUser(d.id);
+        return;
+      }
+      if (myLat === null) return;
+
+      const km = distanceKm(myLat, myLng, data.lat, data.lng);
+      if (km > MAX_DISTANCE_KM) {
+        removeUser(d.id);
+        return;
+      }
+
+      visible++;
+      upsertUser(d.id, data, km);
+    });
+
+    countEl.textContent =
+      visible === 0
+        ? "No one near you right now"
+        : `${visible} people near you right now`;
+
+    countEl.classList.add("show");
+  });
+}
+
+function upsertUser(uid, data, km) {
+  let card = rendered.get(uid);
+  const meters = Math.round(km * 1000);
+
+  if (!card) {
+    card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="avatar"></div>
+      <div class="info">
+        <div class="name"></div>
+        <div class="distance"></div>
+      </div>
+    `;
+    listEl.appendChild(card);
+    rendered.set(uid, card);
+  }
+
+  card.querySelector(".name").textContent = data.name || "Someone";
+  card.querySelector(".distance").textContent = `${meters}m away`;
+}
+
+function removeUser(uid) {
+  const card = rendered.get(uid);
+  if (!card) return;
+  card.classList.add("fade-out");
+  setTimeout(() => {
+    card.remove();
+    rendered.delete(uid);
+  }, 400);
+}
+</script>
+
+</body>
+</html>
