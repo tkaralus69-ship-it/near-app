@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Near — Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --bg:#05070f;
+  --card:rgba(255,255,255,.07);
+  --accent:#1ea7ff;
+  --muted:#9aa3c7;
+  --live:#3cff9e;
+}
+
+*{box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#141a33,#05070f);
+  color:#fff;
+}
+
+.app{
+  max-width:480px;
+  margin:0 auto;
+  padding:24px 16px 120px;
+}
+
+h1{text-align:center;margin:20px 0 6px;font-size:30px}
+.sub{text-align:center;color:var(--muted);margin-bottom:18px}
+
+.grid{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.card{
+  background:var(--card);
+  border-radius:18px;
+  padding:16px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  cursor:pointer;
+  transition:transform .15s;
+}
+
+.card:active{transform:scale(.98)}
+
+.avatar{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,#2b3566,#1a2145);
+  position:relative;
+}
+
+.dot{
+  position:absolute;
+  bottom:2px;right:2px;
+  width:12px;height:12px;border-radius:50%;
+  background:var(--live);
+  border:2px solid #05070f;
+}
+
+.name{font-weight:600}
+.meta{font-size:14px;color:var(--muted)}
+
+/* PROFILE OVERLAY */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(5,7,15,.85);
+  backdrop-filter:blur(12px);
+  display:none;
+  align-items:flex-end;
+}
+
+.sheet{
+  width:100%;
+  max-width:480px;
+  margin:0 auto;
+  background:linear-gradient(#111735,#070b1c);
+  border-radius:22px 22px 0 0;
+  padding:24px 18px 32px;
+  animation:slideUp .35s ease;
+}
+
+@keyframes slideUp{
+  from{transform:translateY(100%)}
+  to{transform:none}
+}
+
+.bigAvatar{
+  width:84px;height:84px;border-radius:50%;
+  background:linear-gradient(135deg,#2b3566,#1a2145);
+  margin-bottom:14px;
+}
+
+.bio{
+  font-size:15px;
+  line-height:1.5;
+  color:#e6e9ff;
+  margin:12px 0 20px;
+}
+
+.actions{
+  display:flex;
+  gap:12px;
+}
+
+button{
+  flex:1;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  font-size:15px;
+}
+
+.like{
+  background:linear-gradient(135deg,#1ea7ff,#1773b8);
+  color:#fff;
+}
+
+.close{
+  background:rgba(255,255,255,.08);
+  color:#fff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <h1>Live</h1>
+  <div class="sub">Tap someone to feel them out</div>
+
+  <div id="grid" class="grid"></div>
+</div>
+
+<!-- PROFILE -->
+<div id="overlay" class="overlay" onclick="closeProfile()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="bigAvatar"></div>
+    <h2 id="pName"></h2>
+    <div class="meta" id="pMeta"></div>
+    <div class="bio" id="pBio"></div>
+
+    <div class="actions">
+      <button class="close" onclick="closeProfile()">Set free</button>
+      <button class="like">Like</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const people=[
+  {name:"Jade",age:31,dist:"900m away",bio:"Here for real moments. If we meet, we meet."},
+  {name:"Sam",age:54,dist:"600m away",bio:"Calm energy. Long walks. Good coffee."},
+  {name:"Elena",age:27,dist:"1.1km away",bio:"Laugh first. Figure the rest out later."},
+  {name:"Michael",age:42,dist:"300m away",bio:"No rush. No games."}
+];
+
+const grid=document.getElementById("grid");
+const overlay=document.getElementById("overlay");
+
+people.forEach(p=>{
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`
+    <div class="avatar"><div class="dot"></div></div>
+    <div>
+      <div class="name">${p.name}, ${p.age}</div>
+      <div class="meta">${p.dist}</div>
+    </div>
+  `;
+  card.onclick=()=>openProfile(p);
+  grid.appendChild(card);
+});
+
+function openProfile(p){
+  document.getElementById("pName").textContent=`${p.name}, ${p.age}`;
+  document.getElementById("pMeta").textContent=p.dist;
+  document.getElementById("pBio").textContent=p.bio;
+  overlay.style.display="flex";
+}
+
+function closeProfile(){
+  overlay.style.display="none";
+}
+</script>
+
+</body>
+</html>
