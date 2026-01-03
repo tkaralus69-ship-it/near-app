@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Near</title>
+
+<style>
+:root { --accent:#1ea7ff; }
+
+* { box-sizing:border-box; font-family:system-ui,-apple-system,sans-serif; }
+
+body {
+  margin:0;
+  background:radial-gradient(circle at top,#12182e,#070b18);
+  color:#fff;
+}
+
+.app {
+  max-width:480px;
+  margin:0 auto;
+  min-height:100vh;
+  padding:24px 16px 120px;
+}
+
+.hidden { display:none; }
+
+h1 {
+  text-align:center;
+  margin:40px 0 8px;
+  font-size:32px;
+}
+
+.tagline {
+  text-align:center;
+  opacity:.7;
+  margin-bottom:32px;
+}
+
+.count {
+  text-align:center;
+  margin-bottom:24px;
+  opacity:.8;
+}
+
+.card {
+  background:linear-gradient(180deg,#161c33,#10152a);
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  cursor:pointer;
+  animation:fadeIn .4s ease forwards;
+}
+
+.avatar {
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:#2a3050;
+}
+
+.name { font-weight:600; }
+.distance { font-size:14px; opacity:.6; }
+
+.cta {
+  position:fixed;
+  bottom:24px;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:center;
+}
+
+.cta button {
+  width:calc(100% - 32px);
+  max-width:480px;
+  padding:16px;
+  border-radius:16px;
+  border:none;
+  background:var(--accent);
+  color:#000;
+  font-weight:700;
+  font-size:16px;
+}
+
+.footer-note {
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  text-align:center;
+  font-size:13px;
+  opacity:.5;
+  padding-bottom:4px;
+}
+
+/* PROFILE SCREEN */
+
+.profile {
+  animation:fadeIn .3s ease;
+}
+
+.profile .avatar {
+  width:96px;
+  height:96px;
+  margin:40px auto 16px;
+}
+
+.profile h2 {
+  text-align:center;
+  margin:0;
+}
+
+.profile p {
+  text-align:center;
+  opacity:.7;
+  margin-top:4px;
+}
+
+.actions {
+  margin-top:40px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.actions button {
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  font-weight:600;
+  font-size:15px;
+}
+
+.like { background:var(--accent); color:#000; }
+.chat { background:#2a3050; color:#fff; }
+.block { background:transparent; color:#aaa; }
+
+.back {
+  position:fixed;
+  top:16px;
+  left:16px;
+  font-size:18px;
+  opacity:.7;
+  cursor:pointer;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LIST SCREEN -->
+<div id="listScreen" class="app">
+  <h1>Near</h1>
+  <div class="tagline">Real people. Near you.</div>
+  <div id="count" class="count"></div>
+  <div id="peopleList"></div>
+</div>
+
+<!-- PROFILE SCREEN -->
+<div id="profileScreen" class="app hidden profile">
+  <div class="back" onclick="goBack()">✕</div>
+  <div class="avatar"></div>
+  <h2 id="pName"></h2>
+  <p id="pDistance"></p>
+
+  <div class="actions">
+    <button class="like" onclick="sayHello()">Say hello</button>
+    <button class="chat" onclick="softClose()">Not feeling it</button>
+    <button class="block" onclick="blockUser()">Block</button>
+  </div>
+</div>
+
+<div class="footer-note">
+  Clear signals • No ghosts • Go live your life
+</div>
+
+<script>
+const people = [
+  { name:"Sam", age:54, distance:"600m away" },
+  { name:"Jade", age:31, distance:"1.1km away" },
+  { name:"Michael", age:42, distance:"300m away" },
+  { name:"Elena", age:27, distance:"900m away" },
+  { name:"David", age:61, distance:"1.4km away" }
+];
+
+const list = document.getElementById("peopleList");
+const count = document.getElementById("count");
+const listScreen = document.getElementById("listScreen");
+const profileScreen = document.getElementById("profileScreen");
+
+const pName = document.getElementById("pName");
+const pDistance = document.getElementById("pDistance");
+
+let activePerson = null;
+
+count.textContent = `${people.length} people near you right now`;
+
+people.forEach(p => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="avatar"></div>
+    <div>
+      <div class="name">${p.name}, ${p.age}</div>
+      <div class="distance">${p.distance}</div>
+    </div>`;
+  card.onclick = () => openProfile(p);
+  list.appendChild(card);
+});
+
+function openProfile(p) {
+  activePerson = p;
+  pName.textContent = `${p.name}, ${p.age}`;
+  pDistance.textContent = p.distance;
+  listScreen.classList.add("hidden");
+  profileScreen.classList.remove("hidden");
+}
+
+function goBack() {
+  profileScreen.classList.add("hidden");
+  listScreen.classList.remove("hidden");
+}
+
+function sayHello() {
+  alert("One message sent. If it flows, it continues.");
+  goBack();
+}
+
+function softClose() {
+  alert("All good. No pressure. Space respected.");
+  goBack();
+}
+
+function blockUser() {
+  alert("User blocked. You won’t see each other again.");
+  goBack();
+}
+</script>
+
+</body>
+</html>
