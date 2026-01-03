@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Near</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: radial-gradient(circle at top, #121a2f, #05070f 70%);
+  color: #fff;
+}
+
+header {
+  padding: 36px 20px 24px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 36px;
+}
+
+header p {
+  margin: 6px 0 0;
+  color: #9aa3c7;
+}
+
+#count {
+  margin-top: 14px;
+  font-size: 18px;
+}
+
+#list {
+  padding: 10px 16px 140px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 20px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2d3b6a, #1b2445);
+}
+
+.info { flex: 1; }
+
+.name { font-weight: 600; font-size: 18px; }
+.distance { font-size: 14px; color: #b6bfdc; }
+
+.like {
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/* CHAT */
+#chat {
+  position: fixed;
+  inset: 0;
+  background: #05070f;
+  display: none;
+  flex-direction: column;
+}
+
+#chatHeader {
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#messages {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.msg {
+  margin-bottom: 10px;
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 15px;
+}
+
+.me {
+  background: #1b8edc;
+  color: #000;
+  margin-left: auto;
+}
+
+.them {
+  background: #1b2140;
+}
+
+#composer {
+  padding: 14px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+#composer textarea {
+  width: 100%;
+  border-radius: 14px;
+  padding: 10px;
+  font-size: 15px;
+  background: #11162d;
+  color: #fff;
+  border: none;
+  resize: none;
+}
+
+.hidden { display: none; }
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Near</h1>
+  <p>Real people. Near you.</p>
+  <div id="count">Loading…</div>
+</header>
+
+<div id="list"></div>
+
+<!-- CHAT -->
+<div id="chat">
+  <div id="chatHeader">Say hello</div>
+  <div id="messages"></div>
+  <div id="composer">
+    <textarea id="chatInput" placeholder="One message. Make it count."></textarea>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+/* 🔴 REPLACE */
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  appId: "YOUR_APP_ID"
+};
+/* 🔴 END */
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let myUid;
+let activeChat = null;
+let messageSent = false;
+
+const listEl = document.getElementById("list");
+const countEl = document.getElementById("count");
+const chatEl = document.getElementById("chat");
+const messagesEl = document.getElementById("messages");
+const inputEl = document.getElementById("chatInput");
+
+signInAnonymously(auth).then(res => {
+  myUid = res.user.uid;
+  listenUsers();
+});
+
+function listenUsers() {
+  onSnapshot(collection(db, "users"), snap => {
+    let c = 0;
+    snap.forEach(d => {
+      if (d.id === myUid) return;
+      const u = d.data();
+      if (!u.name) return;
+      c++;
+      renderUser(d.id, u);
+    });
+    countEl.textContent = `${c} people near you right now`;
+  });
+}
+
+function renderUser(uid, u) {
+  if (document.getElementById(uid)) return;
+
+  const card = document.createElement("div");
+  card.className = "card";
+  card.id = uid;
+  card.innerHTML = `
+    <div class="avatar"></div>
+    <div class="info">
+      <div class="name">${u.name}</div>
+      <div class="distance">Nearby</div>
+    </div>
+    <div class="like">♡</div>
+  `;
+  card.querySelector(".like").onclick = () => like(uid);
+  listEl.appendChild(card);
+}
+
+async function like(uid) {
+  await setDoc(doc(db, "likes", `${myUid}_${uid}`), { at: Date.now() });
+  const reverse = await getDoc(doc(db, "likes", `${uid}_${myUid}`));
+  if (reverse.exists()) openChat(uid);
+}
+
+function openChat(uid) {
+  activeChat = uid;
+  chatEl.style.display = "flex";
+  listenMessages();
+}
+
+function listenMessages() {
+  onSnapshot(collection(db, "chats", chatId(), "messages"), snap => {
+    messagesEl.innerHTML = "";
+    snap.forEach(m => {
+      const d = m.data();
+      const div = document.createElement("div");
+      div.className = "msg " + (d.from === myUid ? "me" : "them");
+      div.textContent = d.text;
+      messagesEl.appendChild(div);
+    });
+  });
+}
+
+function chatId() {
+  return [myUid, activeChat].sort().join("_");
+}
+
+inputEl.addEventListener("keydown", async e => {
+  if (e.key !== "Enter" || e.shiftKey) return;
+  e.preventDefault();
+  if (messageSent) return;
+
+  const text = inputEl.value.trim();
+  if (!text) return;
+
+  messageSent = true;
+  inputEl.disabled = true;
+
+  await addDoc(collection(db, "chats", chatId(), "messages"), {
+    from: myUid,
+    text,
+    at: Date.now()
+  });
+});
+</script>
+
+</body>
+</html>
