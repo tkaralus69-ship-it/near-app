@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Near</title>
+
+<style>
+:root {
+  --accent: #1ea7ff;
+  --bg1: #0b1022;
+  --bg2: #060a18;
+  --card: #121830;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, var(--bg1), var(--bg2));
+  color: #fff;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 24px 16px 120px;
+}
+
+.hidden { display: none; }
+
+h1 {
+  text-align: center;
+  margin: 32px 0 8px;
+  font-size: 32px;
+}
+
+.tagline {
+  text-align: center;
+  opacity: 0.7;
+  margin-bottom: 24px;
+}
+
+.count {
+  text-align: center;
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: linear-gradient(180deg, #161c33, #10152a);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #2a3050;
+}
+
+.info { flex: 1; }
+
+.name { font-weight: 600; }
+.distance { font-size: 14px; opacity: 0.6; }
+
+.button {
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  border: none;
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.secondary {
+  background: transparent;
+  color: #fff;
+  opacity: 0.6;
+}
+
+.footer {
+  position: fixed;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.5;
+}
+
+.chat-bubble {
+  background: #1a2140;
+  padding: 14px;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  max-width: 80%;
+}
+
+.chat-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+input {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<!-- LIST SCREEN -->
+<div id="listScreen">
+  <h1>Near</h1>
+  <div class="tagline">Real people. Near you.</div>
+  <div id="count" class="count"></div>
+  <div id="peopleList"></div>
+</div>
+
+<!-- PROFILE SCREEN -->
+<div id="profileScreen" class="hidden">
+  <button class="secondary" onclick="goList()">← Back</button>
+  <h1 id="profileName"></h1>
+  <p id="profileDistance" class="tagline"></p>
+  <button class="button" onclick="goChat()">Say hello (1 message)</button>
+</div>
+
+<!-- CHAT SCREEN -->
+<div id="chatScreen" class="hidden">
+  <button class="secondary" onclick="goProfile()">← Back</button>
+  <h1>Chat</h1>
+  <p class="tagline">This space is temporary by design</p>
+
+  <div class="chat-bubble">Hey — thanks for saying hello 🙂</div>
+
+  <div class="chat-input">
+    <input id="messageInput" placeholder="Your one reply…" />
+    <button class="button" onclick="sendMessage()">Send</button>
+  </div>
+
+  <button class="secondary" style="margin-top:16px" onclick="softClose()">Set free • Close gently</button>
+</div>
+
+</div>
+
+<div class="footer">
+Clear signals • No ghosts • Go live your life
+</div>
+
+<script>
+const people = [
+  { name: "Sam", age: 54, distance: "600m away" },
+  { name: "Jade", age: 31, distance: "1.1km away" },
+  { name: "Michael", age: 42, distance: "300m away" },
+  { name: "Elena", age: 27, distance: "900m away" },
+  { name: "David", age: 61, distance: "1.4km away" }
+];
+
+let selected = null;
+let replied = false;
+
+const list = document.getElementById("peopleList");
+document.getElementById("count").textContent =
+`${people.length} people near you right now`;
+
+people.forEach(p => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="avatar"></div>
+    <div class="info">
+      <div class="name">${p.name}, ${p.age}</div>
+      <div class="distance">${p.distance}</div>
+    </div>
+  `;
+  card.onclick = () => openProfile(p);
+  list.appendChild(card);
+});
+
+function openProfile(p) {
+  selected = p;
+  document.getElementById("profileName").textContent = `${p.name}, ${p.age}`;
+  document.getElementById("profileDistance").textContent = p.distance;
+  show("profileScreen");
+}
+
+function goChat() {
+  replied = false;
+  document.getElementById("messageInput").value = "";
+  show("chatScreen");
+}
+
+function sendMessage() {
+  if (replied) return;
+  replied = true;
+  document.getElementById("messageInput").disabled = true;
+}
+
+function softClose() {
+  alert("Connection closed gently. No pressure. No ghosts.");
+  goList();
+}
+
+function goList() { show("listScreen"); }
+function goProfile() { show("profileScreen"); }
+
+function show(id) {
+  ["listScreen","profileScreen","chatScreen"].forEach(s =>
+    document.getElementById(s).classList.add("hidden")
+  );
+  document.getElementById(id).classList.remove("hidden");
+}
+</script>
+</body>
+</html>
