@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Near</title>
+
+<style>
+:root {
+  --accent:#1ea7ff;
+  --bg1:#070b18;
+  --bg2:#12182e;
+  --card:#161c33;
+}
+
+* { box-sizing:border-box; font-family:system-ui,-apple-system,sans-serif; }
+
+body {
+  margin:0;
+  background:radial-gradient(circle at top,var(--bg2),var(--bg1));
+  color:#fff;
+  overflow:hidden;
+}
+
+.screen {
+  position:absolute;
+  inset:0;
+  padding:24px 16px 120px;
+  max-width:480px;
+  margin:auto;
+  transition:transform .35s ease, opacity .35s ease;
+}
+
+.hidden {
+  opacity:0;
+  pointer-events:none;
+  transform:translateX(20px);
+}
+
+h1 {
+  text-align:center;
+  margin:40px 0 8px;
+  font-size:32px;
+}
+
+.tagline {
+  text-align:center;
+  opacity:.7;
+  margin-bottom:24px;
+}
+
+.count {
+  text-align:center;
+  opacity:.8;
+  margin-bottom:20px;
+}
+
+.card {
+  background:linear-gradient(180deg,#161c33,#10152a);
+  border-radius:18px;
+  padding:16px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+  margin-bottom:14px;
+  cursor:pointer;
+}
+
+.avatar {
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:#2a3050;
+}
+
+.name { font-weight:600; }
+.sub { opacity:.6; font-size:14px; }
+
+button {
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:16px;
+  font-size:16px;
+  font-weight:700;
+  background:var(--accent);
+  color:#000;
+}
+
+.footer {
+  position:fixed;
+  bottom:8px;
+  left:0;
+  right:0;
+  text-align:center;
+  font-size:13px;
+  opacity:.5;
+}
+
+/* Profile */
+.profile-card {
+  text-align:center;
+  margin-top:60px;
+}
+
+.profile-avatar {
+  width:96px;
+  height:96px;
+  border-radius:50%;
+  background:#2a3050;
+  margin:0 auto 16px;
+}
+
+/* Chat */
+.chat-bubble {
+  background:#1a2140;
+  padding:14px;
+  border-radius:14px;
+  max-width:80%;
+  margin-bottom:12px;
+}
+
+.input-bar {
+  position:fixed;
+  bottom:24px;
+  left:0;
+  right:0;
+  display:flex;
+  gap:8px;
+  padding:0 16px;
+  max-width:480px;
+  margin:auto;
+}
+
+input {
+  flex:1;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  outline:none;
+}
+
+.soft-actions {
+  margin-top:24px;
+  text-align:center;
+  opacity:.6;
+  font-size:14px;
+}
+.soft-actions span {
+  margin:0 12px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LIST -->
+<div class="screen" id="listScreen">
+  <h1>Near</h1>
+  <div class="tagline">Real people. Near you.</div>
+  <div class="count" id="count"></div>
+  <div id="people"></div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen hidden" id="profileScreen">
+  <div class="profile-card">
+    <div class="profile-avatar"></div>
+    <h2 id="pName"></h2>
+    <div class="sub" id="pDistance"></div>
+  </div>
+  <div style="margin-top:40px">
+    <button onclick="openChat()">Say hello (1 message)</button>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="screen hidden" id="chatScreen">
+  <h2 style="text-align:center;margin-top:40px">Chat</h2>
+  <div class="sub" style="text-align:center;margin-bottom:24px">
+    This space is temporary by design
+  </div>
+
+  <div class="chat-bubble">
+    Hey — thanks for saying hello 🙂
+  </div>
+
+  <div class="sub" style="text-align:center;margin-top:12px">
+    You can reply once. If it flows, it continues.
+  </div>
+
+  <div class="input-bar">
+    <input placeholder="Your one reply…" />
+    <button style="width:auto;padding:14px 18px">Send</button>
+  </div>
+
+  <div class="soft-actions">
+    <span onclick="reset()">Set free</span>
+    <span onclick="reset()">Block 🚫</span>
+  </div>
+</div>
+
+<div class="footer">
+  Clear signals • No ghosts • Go live your life
+</div>
+
+<script>
+const people = [
+  {name:"Sam",age:54,d:"600m away"},
+  {name:"Jade",age:31,d:"1.1km away"},
+  {name:"Michael",age:42,d:"300m away"},
+  {name:"Elena",age:27,d:"900m away"},
+  {name:"David",age:61,d:"1.4km away"}
+];
+
+const list = document.getElementById("people");
+const count = document.getElementById("count");
+count.textContent = `${people.length} people near you right now`;
+
+people.forEach(p=>{
+  const c=document.createElement("div");
+  c.className="card";
+  c.innerHTML=`
+    <div class="avatar"></div>
+    <div>
+      <div class="name">${p.name}, ${p.age}</div>
+      <div class="sub">${p.d}</div>
+    </div>`;
+  c.onclick=()=>openProfile(p);
+  list.appendChild(c);
+});
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+
+function openProfile(p){
+  document.getElementById("pName").textContent = `${p.name}, ${p.age}`;
+  document.getElementById("pDistance").textContent = p.d;
+  show("profileScreen");
+}
+
+function openChat(){
+  show("chatScreen");
+}
+
+function reset(){
+  show("listScreen");
+}
+</script>
+
+</body>
+</html>
