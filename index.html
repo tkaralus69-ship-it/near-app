@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Near</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --bg:#070b18;
+  --card:rgba(255,255,255,.06);
+  --accent:#1ea7ff;
+  --muted:#9aa3c7;
+  --good:#4dffb3;
+}
+
+*{box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#141a33,#05070f);
+  color:#fff;
+}
+
+.app{
+  max-width:480px;
+  margin:0 auto;
+  padding:32px 16px 140px;
+}
+
+h1{text-align:center;margin-top:40px;font-size:36px}
+.tagline{text-align:center;color:var(--muted)}
+
+.card{
+  background:var(--card);
+  border-radius:18px;
+  padding:16px;
+  margin-top:22px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  cursor:pointer;
+}
+
+.avatar{
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,#2b3566,#1a2145);
+}
+
+.footer{
+  position:fixed;
+  left:0;right:0;bottom:6px;
+  text-align:center;
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* MODALS */
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal.active{display:flex}
+
+.sheet{
+  background:#0f1530;
+  width:calc(100% - 32px);
+  max-width:420px;
+  border-radius:20px;
+  padding:20px;
+}
+
+.chat{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.messages{
+  max-height:260px;
+  overflow:auto;
+  padding-right:6px;
+}
+
+.msg{
+  padding:10px 14px;
+  border-radius:14px;
+  font-size:14px;
+  width:fit-content;
+}
+
+.me{background:var(--accent);color:#000;margin-left:auto}
+.them{background:#1a2145;color:#fff}
+
+.input{
+  display:flex;
+  gap:8px;
+}
+
+input{
+  flex:1;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  background:#1a2145;
+  color:#fff;
+}
+
+button{
+  padding:12px 14px;
+  border-radius:12px;
+  border:none;
+  background:var(--accent);
+  font-weight:600;
+}
+
+.end{
+  background:#1a2145;
+  color:#cbd3ff;
+}
+
+.timer{
+  font-size:13px;
+  color:var(--good);
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <h1>Near</h1>
+  <div class="tagline">Conversations with purpose</div>
+
+  <div class="card" id="openChat">
+    <div class="avatar"></div>
+    <div>
+      <div><strong>Michael, 42</strong></div>
+      <div style="font-size:14px;color:var(--muted)">Mutual match</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Chats expire • Say what matters
+</div>
+
+<!-- CHAT MODAL -->
+<div class="modal" id="chatModal">
+  <div class="sheet chat">
+    <div class="timer" id="timer"></div>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="input">
+      <input id="text" placeholder="Say something real…" />
+      <button id="send">Send</button>
+    </div>
+
+    <button class="end" id="endChat">End conversation cleanly</button>
+  </div>
+</div>
+
+<!-- END STATE -->
+<div class="modal" id="endedModal">
+  <div class="sheet">
+    <h2>Conversation complete</h2>
+    <p style="color:var(--muted)">
+      You showed up honestly.  
+      No loose ends. No ghosts.
+    </p>
+    <button onclick="location.reload()">Return</button>
+  </div>
+</div>
+
+<script>
+const chatModal=document.getElementById("chatModal");
+const endedModal=document.getElementById("endedModal");
+const messages=document.getElementById("messages");
+const timerEl=document.getElementById("timer");
+
+let timeLeft=120; // seconds
+
+document.getElementById("openChat").onclick=()=>{
+  chatModal.classList.add("active");
+  startTimer();
+};
+
+document.getElementById("send").onclick=send;
+document.getElementById("text").addEventListener("keydown",e=>{
+  if(e.key==="Enter") send();
+});
+
+function send(){
+  const input=document.getElementById("text");
+  if(!input.value.trim()) return;
+
+  addMsg(input.value,"me");
+  input.value="";
+
+  setTimeout(()=>{
+    addMsg("That resonates. Thanks for sharing.","them");
+  },700);
+}
+
+function addMsg(text,who){
+  const d=document.createElement("div");
+  d.className=`msg ${who}`;
+  d.textContent=text;
+  messages.appendChild(d);
+  messages.scrollTop=messages.scrollHeight;
+}
+
+document.getElementById("endChat").onclick=endChat;
+
+function startTimer(){
+  timerEl.textContent=`${timeLeft}s remaining`;
+  const interval=setInterval(()=>{
+    timeLeft--;
+    timerEl.textContent=`${timeLeft}s remaining`;
+    if(timeLeft<=0){
+      clearInterval(interval);
+      endChat();
+    }
+  },1000);
+}
+
+function endChat(){
+  chatModal.classList.remove("active");
+  endedModal.classList.add("active");
+}
+</script>
+
+</body>
+</html>
