@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Near</title>
+
+<style>
+:root {
+  --accent:#1ea7ff;
+}
+
+* {
+  box-sizing:border-box;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+}
+
+body {
+  margin:0;
+  background:radial-gradient(circle at top,#12182e,#070b18);
+  color:#fff;
+}
+
+.app {
+  max-width:480px;
+  margin:0 auto;
+  min-height:100vh;
+  padding:24px 16px 120px;
+}
+
+h1 {
+  text-align:center;
+  margin:40px 0 8px;
+  font-size:32px;
+}
+
+.tagline {
+  text-align:center;
+  opacity:.7;
+  margin-bottom:32px;
+}
+
+.count {
+  text-align:center;
+  margin-bottom:24px;
+  opacity:.8;
+}
+
+.card {
+  background:linear-gradient(180deg,#161c33,#10152a);
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:14px;
+  display:flex;
+  gap:14px;
+  cursor:pointer;
+}
+
+.avatar {
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:#2a3050;
+}
+
+.name { font-weight:600; }
+.distance { font-size:14px; opacity:.6; }
+
+.cta {
+  position:fixed;
+  bottom:24px;
+  left:0; right:0;
+  display:flex;
+  justify-content:center;
+}
+
+.cta button {
+  width:calc(100% - 32px);
+  max-width:480px;
+  padding:16px;
+  border-radius:16px;
+  border:none;
+  background:var(--accent);
+  color:#000;
+  font-weight:700;
+  font-size:16px;
+}
+
+/* OVERLAYS */
+
+.overlay {
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at top,#12182e,#070b18);
+  display:none;
+  flex-direction:column;
+  padding:24px 16px;
+}
+
+.overlay.active { display:flex; }
+
+.topbar {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:24px;
+}
+
+.close {
+  font-size:24px;
+  cursor:pointer;
+}
+
+.profile {
+  text-align:center;
+  margin-top:40px;
+}
+
+.profile .avatar {
+  width:96px;
+  height:96px;
+  margin:0 auto 16px;
+}
+
+.actions button {
+  width:100%;
+  margin-top:12px;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  font-weight:600;
+}
+
+.primary { background:var(--accent); color:#000; }
+.secondary { background:#1c2344; color:#fff; }
+
+/* CHAT */
+
+.chat {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+.bubble {
+  background:#1c2344;
+  border-radius:14px;
+  padding:12px;
+  max-width:80%;
+  margin-bottom:12px;
+}
+
+.me { align-self:flex-end; background:var(--accent); color:#000; }
+
+.input {
+  display:flex;
+  gap:8px;
+}
+
+input {
+  flex:1;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app" id="listView">
+  <h1>Near</h1>
+  <div class="tagline">Real people. Near you.</div>
+  <div id="count" class="count"></div>
+  <div id="peopleList"></div>
+</div>
+
+<!-- PROFILE -->
+<div class="overlay" id="profileView">
+  <div class="topbar">
+    <div class="close" onclick="closeAll()">✕</div>
+  </div>
+  <div class="profile">
+    <div class="avatar"></div>
+    <h2 id="profileName"></h2>
+    <p id="profileDistance"></p>
+
+    <div class="actions">
+      <button class="primary" onclick="openChat()">Say hello</button>
+      <button class="secondary" onclick="softClose()">Set free</button>
+      <button class="secondary" onclick="block()">Block 🚫</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="overlay" id="chatView">
+  <div class="topbar">
+    <div class="close" onclick="closeAll()">✕</div>
+  </div>
+
+  <div class="chat" id="chat">
+    <div class="bubble">Hey — thanks for saying hello 🙂</div>
+  </div>
+
+  <div class="input">
+    <input id="reply" placeholder="Your one reply…" />
+    <button class="primary" onclick="send()">Send</button>
+  </div>
+</div>
+
+<script>
+const people = [
+  { name:"Sam", age:54, distance:"600m away" },
+  { name:"Jade", age:31, distance:"1.1km away" },
+  { name:"Michael", age:42, distance:"300m away" },
+  { name:"Elena", age:27, distance:"900m away" },
+  { name:"David", age:61, distance:"1.4km away" }
+];
+
+let currentPerson = null;
+let replied = false;
+
+const list = document.getElementById("peopleList");
+document.getElementById("count").textContent =
+  `${people.length} people near you right now`;
+
+people.forEach(p => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="avatar"></div>
+    <div>
+      <div class="name">${p.name}, ${p.age}</div>
+      <div class="distance">${p.distance}</div>
+    </div>`;
+  card.onclick = () => openProfile(p);
+  list.appendChild(card);
+});
+
+function openProfile(p){
+  currentPerson = p;
+  document.getElementById("profileName").textContent =
+    `${p.name}, ${p.age}`;
+  document.getElementById("profileDistance").textContent = p.distance;
+  show("profileView");
+}
+
+function openChat(){
+  replied = false;
+  document.getElementById("chat").innerHTML =
+    `<div class="bubble">Hey — thanks for saying hello 🙂</div>`;
+  show("chatView");
+}
+
+function send(){
+  if(replied) return;
+  const text = document.getElementById("reply").value;
+  if(!text) return;
+  replied = true;
+  document.getElementById("chat").innerHTML +=
+    `<div class="bubble me">${text}</div>`;
+  document.getElementById("reply").disabled = true;
+}
+
+function softClose(){
+  alert("Conversation closed kindly. No pressure. No ghosts.");
+  closeAll();
+}
+
+function block(){
+  alert("Blocked. You won’t see each other again.");
+  closeAll();
+}
+
+function show(id){
+  closeAll();
+  document.getElementById(id).classList.add("active");
+}
+
+function closeAll(){
+  document.querySelectorAll(".overlay").forEach(o=>o.classList.remove("active"));
+}
+</script>
+
+</body>
+</html>
