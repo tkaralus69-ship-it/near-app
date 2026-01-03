@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Near</title>
+
+<style>
+:root { --accent:#1ea7ff; }
+
+* { box-sizing:border-box; font-family:system-ui,-apple-system,sans-serif; }
+
+body {
+  margin:0;
+  background:radial-gradient(circle at top,#12182e,#070b18);
+  color:#fff;
+  overflow:hidden;
+}
+
+.screen {
+  position:absolute;
+  inset:0;
+  padding:24px 16px 110px;
+  transition:transform .35s ease, opacity .35s ease;
+}
+
+.hidden { opacity:0; pointer-events:none; transform:translateX(100%); }
+.visible { opacity:1; pointer-events:auto; transform:translateX(0); }
+
+h1 { text-align:center; margin:40px 0 8px; font-size:32px; }
+.tagline { text-align:center; opacity:.7; margin-bottom:32px; }
+
+.card {
+  background:linear-gradient(180deg,#161c33,#10152a);
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:14px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+  cursor:pointer;
+}
+
+.avatar {
+  width:52px;height:52px;border-radius:50%;
+  background:#2a3050;
+}
+
+.name { font-weight:600; }
+.distance { font-size:14px; opacity:.6; }
+
+button {
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:16px;
+  font-weight:700;
+  font-size:16px;
+  background:var(--accent);
+  color:#000;
+}
+
+.secondary { background:#2a3050; color:#fff; margin-top:10px; }
+.danger { background:#3a1f2b; color:#ff9aa9; margin-top:10px; }
+
+.footer {
+  position:fixed;
+  bottom:0; left:0; right:0;
+  padding:10px;
+  text-align:center;
+  font-size:13px;
+  opacity:.5;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LIST SCREEN -->
+<div id="listScreen" class="screen visible">
+  <h1>Near</h1>
+  <div class="tagline">Real people. Near you.</div>
+  <div id="people"></div>
+</div>
+
+<!-- PROFILE SCREEN -->
+<div id="profileScreen" class="screen hidden">
+  <h1 id="pName"></h1>
+  <div class="tagline" id="pDistance"></div>
+
+  <button onclick="openChat()">Say hello (1 message)</button>
+  <button class="secondary" onclick="softClose()">Set free</button>
+  <button class="danger" onclick="blockUser()">Block 🚫</button>
+</div>
+
+<!-- CHAT SCREEN -->
+<div id="chatScreen" class="screen hidden">
+  <h1>Chat</h1>
+  <div class="tagline">This space is temporary by design</div>
+
+  <div class="card">
+    <div class="avatar"></div>
+    <div>
+      <div class="name" id="chatName"></div>
+      <div class="distance">Intent: conversation</div>
+    </div>
+  </div>
+
+  <div class="card">Hey — thanks for saying hello 🙂</div>
+
+  <input placeholder="Your one reply…" style="width:100%;padding:14px;border-radius:14px;border:none;margin-top:20px;">
+  <button style="margin-top:10px">Send</button>
+</div>
+
+<div class="footer">Clear signals • No ghosts • Go live your life</div>
+
+<script>
+const people = [
+ {name:"Sam",age:54,distance:"600m away"},
+ {name:"Jade",age:31,distance:"1.1km away"},
+ {name:"Michael",age:42,distance:"300m away"},
+ {name:"Elena",age:27,distance:"900m away"},
+ {name:"David",age:61,distance:"1.4km away"}
+];
+
+let activePerson=null;
+
+const peopleDiv=document.getElementById("people");
+
+people.forEach((p,i)=>{
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`
+    <div class="avatar"></div>
+    <div>
+      <div class="name">${p.name}, ${p.age}</div>
+      <div class="distance">${p.distance}</div>
+    </div>`;
+  card.onclick=()=>openProfile(i);
+  peopleDiv.appendChild(card);
+});
+
+function show(screen){
+ document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));
+ screen.classList.remove("hidden");
+ screen.classList.add("visible");
+}
+
+function openProfile(i){
+ activePerson=i;
+ document.getElementById("pName").textContent =
+   people[i].name+", "+people[i].age;
+ document.getElementById("pDistance").textContent =
+   people[i].distance;
+ show(profileScreen);
+}
+
+function openChat(){
+ document.getElementById("chatName").textContent =
+   people[activePerson].name+", "+people[activePerson].age;
+ show(chatScreen);
+}
+
+function softClose(){
+ alert("Connection released with respect 💙");
+ show(listScreen);
+}
+
+function blockUser(){
+ people.splice(activePerson,1);
+ location.reload();
+}
+</script>
+
+</body>
+</html>
