@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Near — Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --bg:#05070f;
+  --card:rgba(255,255,255,.07);
+  --accent:#1ea7ff;
+  --muted:#9aa3c7;
+}
+
+*{box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#141a33,#05070f);
+  color:#fff;
+}
+
+.app{
+  max-width:480px;
+  margin:0 auto;
+  padding:24px 16px 120px;
+}
+
+h1{text-align:center;margin:20px 0 6px;font-size:30px}
+.sub{text-align:center;color:var(--muted);margin-bottom:18px}
+
+.card{
+  background:var(--card);
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:14px;
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.avatar{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,#2b3566,#1a2145);
+}
+
+.name{font-weight:600}
+.meta{font-size:14px;color:var(--muted)}
+
+.chat{
+  margin-top:18px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.msg{
+  max-width:80%;
+  padding:12px 14px;
+  border-radius:14px;
+  font-size:15px;
+}
+
+.them{
+  background:#1a2145;
+  align-self:flex-start;
+}
+
+.me{
+  background:var(--accent);
+  color:#000;
+  align-self:flex-end;
+}
+
+.inputBar{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  background:linear-gradient(to top,rgba(5,7,15,.95),rgba(5,7,15,.6));
+  padding:12px;
+}
+
+.inputWrap{
+  max-width:480px;
+  margin:0 auto;
+  display:flex;
+  gap:8px;
+}
+
+input{
+  flex:1;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  background:#1a2145;
+  color:#fff;
+}
+
+button{
+  padding:14px 16px;
+  border-radius:14px;
+  border:none;
+  background:var(--accent);
+  color:#000;
+  font-weight:700;
+}
+
+.notice{
+  text-align:center;
+  font-size:13px;
+  color:var(--muted);
+  margin-top:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <h1>Chat</h1>
+  <div class="sub">This space is temporary by design</div>
+
+  <div class="card">
+    <div class="row">
+      <div class="avatar"></div>
+      <div>
+        <div class="name">Jade, 31</div>
+        <div class="meta">Intent: conversation • 900m away</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chat" class="chat">
+    <div class="msg them">
+      Hey — thanks for saying hello 🙂
+    </div>
+  </div>
+
+  <div id="notice" class="notice">
+    You can reply once. If it flows, it continues.
+  </div>
+</div>
+
+<div class="inputBar">
+  <div class="inputWrap">
+    <input id="input" placeholder="Your one reply…" />
+    <button id="send">Send</button>
+  </div>
+</div>
+
+<script>
+const chat=document.getElementById("chat");
+const input=document.getElementById("input");
+const send=document.getElementById("send");
+const notice=document.getElementById("notice");
+
+let replied=false;
+let matched=true; // simulate mutual match for demo
+let expiresAt=Date.now()+1000*60*5; // 5 min window
+
+send.onclick=()=>{
+  const text=input.value.trim();
+  if(!text||replied) return;
+
+  replied=true;
+  input.disabled=true;
+  send.disabled=true;
+
+  const msg=document.createElement("div");
+  msg.className="msg me";
+  msg.textContent=text;
+  chat.appendChild(msg);
+
+  if(!matched){
+    endChat("No reply this time. That’s okay.");
+    return;
+  }
+
+  setTimeout(()=>{
+    const reply=document.createElement("div");
+    reply.className="msg them";
+    reply.textContent="Nice to hear from you. Want to grab a coffee nearby?";
+    chat.appendChild(reply);
+    notice.textContent="If it feels right, take it offline.";
+  },1200);
+};
+
+function endChat(text){
+  setTimeout(()=>{
+    document.body.innerHTML=`
+      <div class="app" style="text-align:center">
+        <h1>Chat closed</h1>
+        <p style="color:var(--muted)">
+          ${text}<br><br>
+          No pressure. No loss.
+        </p>
+      </div>
+    `;
+  },1500);
+}
+
+// auto-expire
+setInterval(()=>{
+  if(Date.now()>expiresAt){
+    endChat("This chat has gently expired.");
+  }
+},30000);
+</script>
+
+</body>
+</html>
