@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Near</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --bg:#05070f;
+  --card:rgba(255,255,255,.07);
+  --accent:#1ea7ff;
+  --muted:#9aa3c7;
+  --good:#4dffb3;
+}
+
+*{box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#141a33,#05070f);
+  color:#fff;
+}
+
+.app{
+  max-width:480px;
+  margin:0 auto;
+  padding:32px 16px 120px;
+}
+
+h1{text-align:center;margin-top:30px;font-size:34px}
+.sub{text-align:center;color:var(--muted);margin-bottom:24px}
+
+.card{
+  background:var(--card);
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:18px;
+}
+
+.avatar{
+  width:86px;height:86px;border-radius:50%;
+  background:linear-gradient(135deg,#2b3566,#1a2145);
+  margin:0 auto 14px;
+}
+
+input,textarea{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  background:#1a2145;
+  color:#fff;
+  font-size:15px;
+}
+
+textarea{resize:none;height:90px}
+
+.label{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.intent{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.intent button{
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  background:#1a2145;
+  color:#fff;
+  text-align:left;
+  font-size:15px;
+}
+
+.intent button.active{
+  background:var(--accent);
+  color:#000;
+  font-weight:600;
+}
+
+.footer{
+  position:fixed;
+  left:0;right:0;bottom:8px;
+  text-align:center;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.primary{
+  width:100%;
+  padding:16px;
+  border-radius:16px;
+  border:none;
+  background:var(--accent);
+  color:#000;
+  font-size:17px;
+  font-weight:700;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <h1>Your profile</h1>
+  <div class="sub">Enough to be human. Nothing extra.</div>
+
+  <div class="card" style="text-align:center">
+    <div class="avatar"></div>
+    <div style="font-size:13px;color:var(--muted)">
+      Photo optional — faces help, pressure doesn’t
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">Name</div>
+    <input id="name" placeholder="First name" />
+
+    <div class="label" style="margin-top:14px">Age</div>
+    <input id="age" placeholder="Age" inputmode="numeric" />
+  </div>
+
+  <div class="card">
+    <div class="label">One sentence about you</div>
+    <textarea id="bio" maxlength="120"
+      placeholder="Example: Kind, curious, prefers real conversations."></textarea>
+  </div>
+
+  <div class="card">
+    <div class="label">Your intent today</div>
+    <div class="intent" id="intent">
+      <button data-i="walk">Open to meeting if it feels right</button>
+      <button data-i="talk">Just conversation today</button>
+      <button data-i="spark">Looking for something real</button>
+      <button data-i="unsure">Not sure — seeing what happens</button>
+    </div>
+  </div>
+
+  <button class="primary" id="save">Save & go live</button>
+</div>
+
+<div class="footer">
+  Intent can change • Honesty over optimisation
+</div>
+
+<script>
+let selectedIntent=null;
+
+document.querySelectorAll("#intent button").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll("#intent button")
+      .forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedIntent=btn.dataset.i;
+  };
+});
+
+document.getElementById("save").onclick=()=>{
+  const name=document.getElementById("name").value.trim();
+  const age=document.getElementById("age").value.trim();
+  const bio=document.getElementById("bio").value.trim();
+
+  if(!name||!age||!selectedIntent){
+    alert("Just the basics — name, age, intent.");
+    return;
+  }
+
+  document.body.innerHTML=`
+    <div class="app" style="text-align:center">
+      <h1>You’re live</h1>
+      <p style="color:var(--muted)">
+        You’ve said enough.  
+        The rest happens nearby.
+      </p>
+      <div style="margin-top:28px;font-size:15px;color:var(--good)">
+        Intent set ✔
+      </div>
+    </div>
+  `;
+};
+</script>
+
+</body>
+</html>
