@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Near</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+:root{
+  --bg1:#12182e;
+  --bg2:#070b18;
+  --card:rgba(255,255,255,0.06);
+  --accent:#1ea7ff;
+  --muted:#9aa3c7;
+}
+
+*{box-sizing:border-box;font-family:system-ui,sans-serif}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,var(--bg1),var(--bg2));
+  color:#fff;
+}
+
+header{
+  padding:32px 20px 12px;
+  text-align:center;
+}
+
+header h1{margin:0;font-size:36px}
+header p{margin:6px 0;color:var(--muted)}
+#count{font-size:15px;opacity:.8}
+
+#list{
+  max-width:520px;
+  margin:0 auto;
+  padding:16px 16px 160px;
+}
+
+.card{
+  display:flex;
+  gap:14px;
+  padding:16px;
+  margin-bottom:14px;
+  background:var(--card);
+  border-radius:18px;
+  backdrop-filter:blur(10px);
+  animation:fadeIn .4s ease;
+}
+
+.card.me{outline:2px solid var(--accent)}
+
+.avatar{
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,#2d3b6a,#1b2445);
+}
+
+.info{flex:1}
+.name{font-size:18px;font-weight:600}
+.meta{font-size:14px;color:var(--muted);margin-top:4px}
+
+.hello{
+  font-size:14px;
+  color:var(--accent);
+  margin-top:6px;
+  cursor:pointer;
+}
+
+footer{
+  position:fixed;left:0;right:0;bottom:0;
+  padding:16px;
+  background:linear-gradient(to top,rgba(7,11,24,.95),rgba(7,11,24,.6));
+}
+
+button{
+  width:100%;
+  max-width:520px;
+  margin:0 auto;
+  display:block;
+  padding:16px;
+  font-size:18px;
+  border-radius:14px;
+  border:none;
+  font-weight:700;
+  background:var(--accent);
+  color:#000;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:none}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Near</h1>
+  <p>Real people. Near you.</p>
+  <div id="count">Looking around…</div>
+</header>
+
+<div id="list"></div>
+
+<footer>
+  <button disabled>Say hello (soft)</button>
+</footer>
+
+<script type="module">
+/* =========================
+   HELPERS
+========================= */
+function distanceKm(lat1,lng1,lat2,lng2){
+  const R=6371;
+  const dLat=(lat2-lat1)*Math.PI/180;
+  const dLng=(lng2-lng1)*Math.PI/180;
+  const a=
+    Math.sin(dLat/2)**2 +
+    Math.cos(lat1*Math.PI/180) *
+    Math.cos(lat2*Math.PI/180) *
+    Math.sin(dLng/2)**2;
+  return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+}
+
+function formatDistance(km){
+  return km < 1
+    ? `${Math.round(km*1000)}m away`
+    : `${km.toFixed(1)}km away`;
+}
+
+/* =========================
+   STATE
+========================= */
+const list=document.getElementById("list");
+const count=document.getElementById("count");
+
+let myUid=null;
+let myLat=null;
+let myLng=null;
+
+const ACTIVE_MS = 60_000; // 1 minute presence window
+
+/* =========================
+   FIREBASE
+========================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  onSnapshot,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const firebaseConfig={
+  apiKey:"YOUR_KEY",
+  authDomain:"YOUR_DOMAIN",
+  projectId:"YOUR_ID",
+  appId:"YOUR_APP"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+signInAnonymously(auth).then(cred=>{
+  myUid=cred.user.uid;
+
+  navigator.geolocation.watchPosition(pos=>{
+    myLat=pos.coords.latitude;
+    myLng=pos.coords.longitude;
+
+    setDoc(doc(db,"users",myUid),{
+      lat:myLat,
+      lng:myLng,
+      updatedAt:Date.now()
+    },{merge:true});
+  });
+
+  listen();
+});
+
+/* =========================
+   LISTEN
+========================= */
+function listen(){
+  onSnapshot(collection(db,"users"),snap=>{
+    render(snap);
+  });
+}
+
+/* =========================
+   RENDER
+========================= */
+function render(snap){
+  list.innerHTML="";
+  let visible=0;
+  const now=Date.now();
+
+  snap.forEach(d=>{
+    if(d.id===myUid) return;
+    const u=d.data();
+    if(!u.lat || !u.updatedAt) return;
+    if(now-u.updatedAt > ACTIVE_MS) return;
+    if(myLat==null) return;
+
+    const km=distanceKm(myLat,myLng,u.lat,u.lng);
+    if(km>5) return;
+
+    visible++;
+
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+      <div class="avatar"></div>
+      <div class="info">
+        <div class="name">${u.name||"Someone"}</div>
+        <div class="meta">${formatDistance(km)}</div>
+        <div class="hello">Say hello</div>
+      </div>
+    `;
+
+    card.querySelector(".hello").onclick=()=>{
+      card.querySelector(".hello").textContent="Hello sent ✨";
+    };
+
+    list.appendChild(card);
+  });
+
+  count.textContent = visible
+    ? `${visible} people near you`
+    : "No one near you right now";
+}
+</script>
+
+</body>
+</html>
