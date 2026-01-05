@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Near</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+:root {
+  --bg1:#12182e;
+  --bg2:#070b18;
+  --card:rgba(255,255,255,0.06);
+  --accent:#1ea7ff;
+  --muted:#9aa3c7;
+}
+
+* { box-sizing:border-box; font-family:system-ui,sans-serif }
+
+body {
+  margin:0;
+  background:radial-gradient(circle at top,var(--bg1),var(--bg2));
+  color:#fff;
+}
+
+header {
+  padding:32px 20px 12px;
+  text-align:center;
+}
+
+header h1 { margin:0; font-size:36px }
+header p { margin:6px 0; color:var(--muted) }
+#count { font-size:15px; opacity:.8 }
+
+#list {
+  max-width:520px;
+  margin:0 auto;
+  padding:16px 16px 160px;
+}
+
+.card {
+  display:flex;
+  gap:14px;
+  padding:16px;
+  margin-bottom:14px;
+  background:var(--card);
+  border-radius:18px;
+  backdrop-filter:blur(10px);
+}
+
+.card.me { outline:2px solid var(--accent) }
+
+.avatar {
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,#2d3b6a,#1b2445);
+}
+
+.info { display:flex;flex-direction:column }
+.name { font-size:18px;font-weight:600 }
+.distance,.now { font-size:14px;color:var(--muted);margin-top:4px }
+
+.hello {
+  margin-left:auto;
+  align-self:center;
+  background:none;
+  border:1px solid var(--accent);
+  color:var(--accent);
+  padding:8px 12px;
+  border-radius:12px;
+  font-weight:600;
+}
+
+footer {
+  position:fixed;left:0;right:0;bottom:0;
+  padding:16px;
+  background:linear-gradient(to top,rgba(7,11,24,.95),rgba(7,11,24,.6));
+}
+
+button.main {
+  width:100%;max-width:520px;margin:0 auto;display:block;
+  padding:16px;font-size:18px;border-radius:14px;
+  border:none;font-weight:700;background:var(--accent);color:#000;
+}
+
+.sheet {
+  position:fixed;left:0;right:0;bottom:-100%;
+  background:#0b1022;
+  border-radius:22px 22px 0 0;
+  padding:20px;
+  transition:.35s ease;
+}
+
+.sheet.open { bottom:0 }
+
+.sheet input {
+  width:100%;padding:14px;margin-bottom:12px;
+  border-radius:12px;border:none;
+}
+
+.sheet small { color:var(--muted) }
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Near</h1>
+  <p>Real people. Near you.</p>
+  <div id="count">Finding people…</div>
+</header>
+
+<div id="list"></div>
+
+<footer>
+  <button class="main">Say hello (1 message)</button>
+</footer>
+
+<div class="sheet" id="profileSheet">
+  <h2>Your presence</h2>
+  <input id="pName" placeholder="Name (optional)" />
+  <input id="pAge" placeholder="Age range (eg 30s)" />
+  <input id="pNow" placeholder="Right now I'm…" />
+  <button class="main" onclick="saveProfile()">Save</button>
+  <small>Nothing here is permanent.</small>
+</div>
+
+<script type="module">
+/* =========================
+   STATE
+========================= */
+const list = document.getElementById("list");
+const count = document.getElementById("count");
+const sheet = document.getElementById("profileSheet");
+
+let myUid = null;
+let myLat = null;
+let myLng = null;
+
+let profile = JSON.parse(localStorage.getItem("nearProfile") || "{}");
+
+const PRESENCE_EXPIRY = 1000 * 60 * 45; // 45 min
+
+/* =========================
+   DISTANCE
+========================= */
+function distanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2)**2 +
+    Math.cos(lat1*Math.PI/180) *
+    Math.cos(lat2*Math.PI/180) *
+    Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function humanDistance(km) {
+  if (km < 0.2) return "Very near";
+  if (km < 0.5) return "Near";
+  if (km < 1) return "A short walk away";
+  if (km < 3) return "Nearby";
+  return "Around you";
+}
+
+function isActive(u) {
+  return Date.now() - u.updatedAt < PRESENCE_EXPIRY;
+}
+
+/* =========================
+   PROFILE
+========================= */
+function openProfile() {
+  sheet.classList.add("open");
+  pName.value = profile.name || "";
+  pAge.value = profile.age || "";
+  pNow.value = profile.now || "";
+}
+
+window.saveProfile = () => {
+  profile = {
+    name:pName.value.trim(),
+    age:pAge.value.trim(),
+    now:pNow.value.trim()
+  };
+  localStorage.setItem("nearProfile", JSON.stringify(profile));
+  sheet.classList.remove("open");
+  updateFirestore();
+  refresh();
+};
+
+/* =========================
+   FIREBASE
+========================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"YOUR_KEY",
+  authDomain:"YOUR_DOMAIN",
+  projectId:"YOUR_ID",
+  appId:"YOUR_APP"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+signInAnonymously(auth).then(cred=>{
+  myUid = cred.user.uid;
+  navigator.geolocation.watchPosition(pos=>{
+    myLat = pos.coords.latitude;
+    myLng = pos.coords.longitude;
+    updateFirestore();
+  });
+  listen();
+});
+
+function updateFirestore() {
+  if (!myLat) return;
+  setDoc(doc(db,"users",myUid),{
+    ...profile,
+    lat:myLat,
+    lng:myLng,
+    updatedAt:Date.now()
+  },{merge:true});
+}
+
+/* =========================
+   HELLO
+========================= */
+async function sendHello(toUid) {
+  await setDoc(doc(db,"hellos",`${myUid}_${toUid}`),{
+    from:myUid,
+    to:toUid,
+    timestamp:Date.now()
+  });
+}
+
+/* =========================
+   LISTEN & RENDER
+========================= */
+function listen(){
+  onSnapshot(collection(db,"users"),snap=>{
+    refresh(snap);
+  });
+}
+
+function refresh(snap){
+  list.innerHTML = "";
+
+  // ME
+  const me = document.createElement("div");
+  me.className = "card me";
+  me.innerHTML = `
+    <div class="avatar"></div>
+    <div class="info">
+      <div class="name">${profile.name || "You"} ${profile.age || ""}</div>
+      <div class="now">${profile.now || "Tap to add presence"}</div>
+    </div>
+  `;
+  me.oncontextmenu = e => { e.preventDefault(); openProfile(); };
+  list.appendChild(me);
+
+  let visible = 0;
+  if (!snap) return;
+
+  snap.forEach(d=>{
+    if (d.id === myUid) return;
+    const u = d.data();
+    if (!u.lat || !isActive(u)) return;
+
+    const km = distanceKm(myLat,myLng,u.lat,u.lng);
+    const c = document.createElement("div");
+    c.className = "card";
+    c.innerHTML = `
+      <div class="avatar"></div>
+      <div class="info">
+        <div class="name">${u.name || "Someone"} ${u.age || ""}</div>
+        <div class="distance">${humanDistance(km)}</div>
+        <div class="now">${u.now || ""}</div>
+      </div>
+      <button class="hello" onclick="sendHello('${d.id}')">Hello</button>
+    `;
+    list.appendChild(c);
+    visible++;
+  });
+
+  count.textContent = visible
+    ? `${visible} people near you`
+    : "No one near you right now";
+}
+</script>
+</body>
+</html>
