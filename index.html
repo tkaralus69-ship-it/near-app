@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg1: #12182e;
+      --bg2: #070b18;
+      --card: rgba(255,255,255,0.06);
+      --accent: #1ea7ff;
+      --muted: #9aa3c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, var(--bg1), var(--bg2));
+      color: #fff;
+    }
+
+    header {
+      padding: 32px 20px 12px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 36px;
+      font-weight: 700;
+    }
+
+    header p {
+      margin: 6px 0 12px;
+      color: var(--muted);
+    }
+
+    #count {
+      font-size: 16px;
+      opacity: 0.85;
+    }
+
+    #list {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px 16px 140px;
+    }
+
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      background: var(--card);
+      border-radius: 18px;
+      backdrop-filter: blur(10px);
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2d3b6a, #1b2445);
+      flex-shrink: 0;
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .name {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .distance {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    footer {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 16px;
+      background: linear-gradient(to top, rgba(7,11,24,0.95), rgba(7,11,24,0.6));
+    }
+
+    button {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      display: block;
+      padding: 16px;
+      font-size: 18px;
+      border-radius: 14px;
+      border: none;
+      font-weight: 700;
+      color: #000;
+      background: var(--accent);
+    }
+
+    .tagline {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Near</h1>
+  <p>Real people. Near you.</p>
+  <div id="count">Finding people near you…</div>
+</header>
+
+<div id="list"></div>
+
+<footer>
+  <button>Say hello (1 message)</button>
+  <div class="tagline">One message • No pressure • No ghosts</div>
+</footer>
+
+<script type="module">
+  // --------------------------------------------------
+  // MOCK USERS (ALWAYS SHOW FIRST)
+  // --------------------------------------------------
+  const mockPeople = [
+    { name: "Sam", age: 54, distance: "600m away" },
+    { name: "Jade", age: 31, distance: "1.1km away" },
+    { name: "Michael", age: 42, distance: "300m away" },
+    { name: "Elena", age: 27, distance: "900m away" },
+    { name: "David", age: 61, distance: "1.4km away" }
+  ];
+
+  const listEl = document.getElementById("list");
+  const countEl = document.getElementById("count");
+
+  function renderMock() {
+    listEl.innerHTML = "";
+    mockPeople.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="avatar"></div>
+        <div class="info">
+          <div class="name">${p.name}, ${p.age}</div>
+          <div class="distance">${p.distance}</div>
+        </div>
+      `;
+      listEl.appendChild(card);
+    });
+    countEl.textContent = `${mockPeople.length} people near you right now`;
+  }
+
+  renderMock(); // 🔥 instant UI
+
+  // --------------------------------------------------
+  // LIVE UPGRADE (Firebase + Geo)
+  // --------------------------------------------------
+  try {
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+    import {
+      getAuth,
+      signInAnonymously
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      onSnapshot,
+      collection
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let myUid = null;
+    let myLat = null;
+    let myLng = null;
+    const ACTIVE_MS = 45000;
+    const rendered = new Map();
+
+    function km(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat/2)**2 +
+        Math.cos(lat1*Math.PI/180) *
+        Math.cos(lat2*Math.PI/180) *
+        Math.sin(dLon/2)**2;
+      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+    }
+
+    signInAnonymously(auth).then(cred => {
+      myUid = cred.user.uid;
+
+      navigator.geolocation.watchPosition(pos => {
+        myLat = pos.coords.latitude;
+        myLng = pos.coords.longitude;
+
+        setDoc(doc(db, "users", myUid), {
+          lat: myLat,
+          lng: myLng,
+          updatedAt: Date.now(),
+          name: "Someone"
+        }, { merge: true });
+      });
+
+      onSnapshot(collection(db, "users"), snap => {
+        const now = Date.now();
+        let visible = 0;
+        listEl.innerHTML = "";
+
+        snap.forEach(d => {
+          if (d.id === myUid) return;
+          const u = d.data();
+          if (!u.lat || !u.lng || now - u.updatedAt > ACTIVE_MS) return;
+          if (!myLat) return;
+
+          const distKm = km(myLat, myLng, u.lat, u.lng);
+          if (distKm > 5) return;
+
+          visible++;
+          const meters = Math.round(distKm * 1000);
+
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div class="avatar"></div>
+            <div class="info">
+              <div class="name">${u.name || "Someone"}</div>
+              <div class="distance">${meters}m away</div>
+            </div>
+          `;
+          listEl.appendChild(card);
+        });
+
+        countEl.textContent =
+          visible === 0
+            ? "No one near you right now"
+            : `${visible} people near you right now`;
+      });
+    });
+
+  } catch (e) {
+    // Silent fail → mock stays
+    console.log("Live upgrade unavailable");
+  }
+</script>
+
+</body>
+</html>
