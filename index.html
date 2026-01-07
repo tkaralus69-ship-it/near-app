@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Near</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+:root {
+  --bg1:#12182e;
+  --bg2:#070b18;
+  --card:rgba(255,255,255,0.06);
+  --accent:#1ea7ff;
+  --muted:#9aa3c7;
+}
+
+* { box-sizing:border-box; font-family:system-ui,sans-serif }
+
+body {
+  margin:0;
+  background:radial-gradient(circle at top,var(--bg1),var(--bg2));
+  color:#fff;
+}
+
+header {
+  padding:32px 20px 12px;
+  text-align:center;
+}
+
+header h1 { margin:0;font-size:36px }
+header p { margin:6px 0;color:var(--muted) }
+#count { font-size:14px;opacity:.8 }
+
+#list {
+  max-width:520px;
+  margin:0 auto;
+  padding:16px 16px 160px;
+}
+
+.card {
+  display:flex;
+  gap:14px;
+  padding:16px;
+  margin-bottom:14px;
+  background:var(--card);
+  border-radius:18px;
+  backdrop-filter:blur(10px);
+  align-items:center;
+}
+
+.card.me { outline:2px solid var(--accent) }
+
+.avatar {
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,#2d3b6a,#1b2445);
+}
+
+.info { flex:1 }
+.name { font-size:18px;font-weight:600 }
+.meta,.now { font-size:14px;color:var(--muted);margin-top:4px }
+
+.wave {
+  font-size:22px;
+  cursor:pointer;
+  transition:transform .2s;
+}
+.wave:hover { transform:scale(1.2) }
+
+footer {
+  position:fixed;left:0;right:0;bottom:0;
+  padding:16px;
+  background:linear-gradient(to top,rgba(7,11,24,.95),rgba(7,11,24,.6));
+}
+
+button {
+  width:100%;max-width:520px;margin:0 auto;display:block;
+  padding:16px;font-size:18px;border-radius:14px;
+  border:none;font-weight:700;background:var(--accent);color:#000;
+}
+
+.sheet {
+  position:fixed;left:0;right:0;bottom:-100%;
+  background:#0b1022;
+  border-radius:22px 22px 0 0;
+  padding:20px;
+  transition:.35s ease;
+}
+
+.sheet.open { bottom:0 }
+
+.sheet input {
+  width:100%;padding:14px;margin-bottom:12px;
+  border-radius:12px;border:none;
+}
+
+.waveMatch {
+  position:fixed;
+  bottom:120px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(30,167,255,.15);
+  backdrop-filter:blur(12px);
+  padding:18px 24px;
+  border-radius:18px;
+  text-align:center;
+  animation:fadeUp .4s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translate(-50%,20px); }
+  to { opacity:1; transform:translate(-50%,0); }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Near</h1>
+  <p>Real people. Near you.</p>
+  <div id="count">Finding people…</div>
+</header>
+
+<div id="list"></div>
+
+<footer>
+  <button>Presence only · No pressure</button>
+</footer>
+
+<div class="sheet" id="profileSheet">
+  <input id="pName" placeholder="Name" />
+  <input id="pAge" placeholder="Age range (30s)" />
+  <input id="pNow" placeholder="Right now I'm…" />
+  <button onclick="saveProfile()">Save</button>
+</div>
+
+<script type="module">
+/* ================= STATE ================= */
+const list = document.getElementById("list");
+const count = document.getElementById("count");
+const sheet = document.getElementById("profileSheet");
+
+let myUid = null;
+let profile = JSON.parse(localStorage.getItem("nearProfile")||"{}");
+let myLat = null, myLng = null;
+
+/* ================= UTILS ================= */
+function distanceKm(a,b,c,d){
+  const R=6371;
+  const dLat=(c-a)*Math.PI/180;
+  const dLng=(d-b)*Math.PI/180;
+  const x=Math.sin(dLat/2)**2+
+    Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*
+    Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+/* ================= PROFILE ================= */
+function openProfile(){
+  sheet.classList.add("open");
+  pName.value=profile.name||"";
+  pAge.value=profile.age||"";
+  pNow.value=profile.now||"";
+}
+
+window.saveProfile=()=>{
+  profile={
+    name:pName.value.trim(),
+    age:pAge.value.trim(),
+    now:pNow.value.trim()
+  };
+  localStorage.setItem("nearProfile",JSON.stringify(profile));
+  sheet.classList.remove("open");
+  if(myUid) updateFirestore();
+  refresh();
+};
+
+/* ================= FIREBASE ================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, collection,
+  onSnapshot, deleteDoc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const app=initializeApp({
+  apiKey:"YOUR_KEY",
+  authDomain:"YOUR_DOMAIN",
+  projectId:"YOUR_ID",
+  appId:"YOUR_APP"
+});
+
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+signInAnonymously(auth).then(c=>{
+  myUid=c.user.uid;
+  navigator.geolocation.watchPosition(p=>{
+    myLat=p.coords.latitude;
+    myLng=p.coords.longitude;
+    updateFirestore(myLat,myLng);
+  });
+  listenUsers();
+  listenWaves();
+});
+
+/* ================= FIRESTORE ================= */
+function updateFirestore(lat,lng){
+  setDoc(doc(db,"users",myUid),{
+    ...profile,lat,lng,updatedAt:Date.now()
+  },{merge:true});
+}
+
+/* ================= WAVES ================= */
+function sendWave(toUid){
+  const id=[myUid,toUid].sort().join("_");
+  setDoc(doc(db,"waves",id),{
+    from:myUid,to:toUid,createdAt:Date.now()
+  });
+}
+
+function listenWaves(){
+  onSnapshot(collection(db,"waves"),snap=>{
+    const now=Date.now();
+    snap.forEach(d=>{
+      const w=d.data();
+      if(now-w.createdAt>10*60*1000){
+        deleteDoc(doc(db,"waves",d.id));
+        return;
+      }
+      if(w.from===myUid||w.to===myUid){
+        showWaveMatch();
+      }
+    });
+  });
+}
+
+function showWaveMatch(){
+  if(document.getElementById("waveMatch")) return;
+  const box=document.createElement("div");
+  box.id="waveMatch";
+  box.className="waveMatch";
+  box.innerHTML=`🌊<br>You noticed each other`;
+  document.body.appendChild(box);
+  setTimeout(()=>box.remove(),6000);
+}
+
+/* ================= USERS ================= */
+function listenUsers(){
+  onSnapshot(collection(db,"users"),snap=>refresh(snap));
+}
+
+function refresh(snap){
+  list.innerHTML="";
+  renderMe();
+  let visible=0;
+
+  if(!snap||!myLat) return;
+
+  snap.forEach(d=>{
+    if(d.id===myUid) return;
+    const u=d.data();
+    if(!u.lat) return;
+
+    const km=distanceKm(myLat,myLng,u.lat,u.lng);
+    if(km>5) return;
+
+    visible++;
+    const c=document.createElement("div");
+    c.className="card";
+    c.innerHTML=`
+      <div class="avatar"></div>
+      <div class="info">
+        <div class="name">${u.name||"Someone"} ${u.age||""}</div>
+        <div class="meta">${km.toFixed(1)} km away</div>
+        <div class="now">${u.now||""}</div>
+      </div>
+      <div class="wave">👋</div>
+    `;
+    c.querySelector(".wave").onclick=()=>sendWave(d.id);
+    list.appendChild(c);
+  });
+
+  count.textContent=visible
+    ? `${visible} people near you`
+    : "No one near you right now";
+}
+
+function renderMe(){
+  const c=document.createElement("div");
+  c.className="card me";
+  c.innerHTML=`
+    <div class="avatar"></div>
+    <div class="info">
+      <div class="name">${profile.name||"You"} ${profile.age||""}</div>
+      <div class="now">${profile.now||"Tap to add presence"}</div>
+    </div>
+  `;
+  c.oncontextmenu=e=>{e.preventDefault();openProfile();};
+  list.appendChild(c);
+}
+</script>
+
+</body>
+</html>
