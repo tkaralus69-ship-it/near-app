@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Near</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+:root{
+  --bg1:#12182e;
+  --bg2:#070b18;
+  --card:rgba(255,255,255,.06);
+  --accent:#1ea7ff;
+  --muted:#9aa3c7;
+}
+
+*{box-sizing:border-box;font-family:system-ui,sans-serif}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,var(--bg1),var(--bg2));
+  color:#fff;
+}
+
+header{text-align:center;padding:30px 16px}
+h1{margin:0;font-size:36px}
+p{margin:6px 0;color:var(--muted)}
+#count{opacity:.8;font-size:14px}
+
+#list{max-width:520px;margin:0 auto;padding:16px 16px 160px}
+
+.card{
+  background:var(--card);
+  padding:16px;
+  border-radius:18px;
+  margin-bottom:14px;
+  display:flex;
+  gap:14px;
+  backdrop-filter:blur(10px)
+}
+.card.me{outline:2px solid var(--accent)}
+
+.avatar{
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,#2d3b6a,#1b2445)
+}
+
+.info{display:flex;flex-direction:column}
+.name{font-size:18px;font-weight:600}
+.now,.distance{font-size:14px;color:var(--muted);margin-top:4px}
+
+footer{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:16px;
+  background:linear-gradient(to top,#070b18,rgba(7,11,24,.6))
+}
+
+button{
+  width:100%;max-width:520px;margin:0 auto;
+  padding:16px;border-radius:14px;
+  font-size:18px;font-weight:700;
+  border:none;background:var(--accent);color:#000
+}
+
+.sheet{
+  position:fixed;left:0;right:0;bottom:-100%;
+  background:#0b1022;padding:20px;
+  border-radius:22px 22px 0 0;
+  transition:.35s ease
+}
+.sheet.open{bottom:0}
+
+.sheet textarea,.sheet input{
+  width:100%;padding:14px;margin-bottom:12px;
+  border-radius:12px;border:none
+}
+
+small{color:var(--muted)}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Near</h1>
+  <p>Real people. Near you.</p>
+  <div id="count">Finding people…</div>
+</header>
+
+<div id="list"></div>
+
+<footer>
+  <button onclick="openProfile()">Wave 👋</button>
+</footer>
+
+<!-- PROFILE -->
+<div class="sheet" id="profileSheet">
+  <h2>Your presence</h2>
+  <input id="pName" placeholder="Name" />
+  <input id="pAge" placeholder="Age range (30s)" />
+  <input id="pNow" placeholder="Right now I'm…" />
+  <button onclick="saveProfile()">Save</button>
+  <small>Nothing here is permanent.</small>
+</div>
+
+<!-- TEXT GATE -->
+<div class="sheet" id="textGate">
+  <h3>Words first</h3>
+  <p style="color:var(--muted)">
+    Take your time. When both of you reach 250 characters,
+    everything else unlocks naturally.
+  </p>
+  <textarea id="gateText" placeholder="Write freely…"></textarea>
+  <div id="charCount">0 / 250</div>
+  <button onclick="sendText()">Send</button>
+</div>
+
+<script type="module">
+/* ================= STATE ================= */
+const list=document.getElementById("list");
+const count=document.getElementById("count");
+const profileSheet=document.getElementById("profileSheet");
+const textGate=document.getElementById("textGate");
+
+let myUid=null;
+let activeChat=null;
+let profile=JSON.parse(localStorage.getItem("nearProfile")||"{}");
+
+/* ================= PROFILE ================= */
+window.openProfile=()=>{
+  profileSheet.classList.add("open");
+  pName.value=profile.name||"";
+  pAge.value=profile.age||"";
+  pNow.value=profile.now||"";
+};
+
+window.saveProfile=()=>{
+  profile={
+    name:pName.value.trim(),
+    age:pAge.value.trim(),
+    now:pNow.value.trim()
+  };
+  localStorage.setItem("nearProfile",JSON.stringify(profile));
+  profileSheet.classList.remove("open");
+  refresh();
+};
+
+/* ================= FIREBASE ================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const app=initializeApp({
+  apiKey:"YOUR_KEY",
+  authDomain:"YOUR_DOMAIN",
+  projectId:"YOUR_ID",
+  appId:"YOUR_APP"
+});
+
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+signInAnonymously(auth).then(c=>{
+  myUid=c.user.uid;
+  navigator.geolocation.watchPosition(pos=>{
+    setDoc(doc(db,"users",myUid),{
+      ...profile,
+      lat:pos.coords.latitude,
+      lng:pos.coords.longitude,
+      updatedAt:Date.now()
+    },{merge:true});
+  });
+  listen();
+});
+
+/* ================= LISTEN ================= */
+function listen(){
+  onSnapshot(collection(db,"users"),snap=>refresh(snap));
+}
+
+/* ================= RENDER ================= */
+function refresh(snap){
+  list.innerHTML="";
+  renderMe();
+
+  let visible=0;
+  if(!snap)return;
+
+  snap.forEach(d=>{
+    if(d.id===myUid)return;
+    const u=d.data();
+    if(!u.lat)return;
+
+    visible++;
+
+    const c=document.createElement("div");
+    c.className="card";
+    c.innerHTML=`
+      <div class="avatar"></div>
+      <div class="info">
+        <div class="name">${u.name||"Someone"} ${u.age||""}</div>
+        <div class="now">${u.now||""}</div>
+      </div>
+    `;
+    c.onclick=()=>openTextGate(d.id);
+    list.appendChild(c);
+  });
+
+  count.textContent=visible
+    ? `${visible} people near you`
+    : "No one near you right now";
+}
+
+function renderMe(){
+  const c=document.createElement("div");
+  c.className="card me";
+  c.innerHTML=`
+    <div class="avatar"></div>
+    <div class="info">
+      <div class="name">${profile.name||"You"} ${profile.age||""}</div>
+      <div class="now">${profile.now||"Tap wave to add presence"}</div>
+    </div>`;
+  list.appendChild(c);
+}
+
+/* ================= TEXT GATE ================= */
+function openTextGate(uid){
+  activeChat=[myUid,uid].sort().join("_");
+  textGate.classList.add("open");
+}
+
+gateText.oninput=()=>{
+  charCount.textContent=`${gateText.value.length} / 250`;
+};
+
+window.sendText=()=>{
+  if(gateText.value.length<250){
+    alert("A little more time. No rush 🤍");
+    return;
+  }
+
+  setDoc(doc(db,"chats",activeChat),{
+    users:[...activeChat.split("_")],
+    textCount:{[myUid]:gateText.value.length},
+    updatedAt:Date.now()
+  },{merge:true});
+
+  textGate.classList.remove("open");
+  gateText.value="";
+  charCount.textContent="0 / 250";
+};
+</script>
+</body>
+</html>
