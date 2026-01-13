@@ -1,0 +1,238 @@
+/* styles.css (FULL) */
+
+:root{
+  --bg1:#2e3a3f;
+  --bg2:#0b0f12;
+  --accent1:#6ee7b7;
+  --accent2:#7dd3fc;
+  --card: rgba(255,255,255,0.06);
+  --card2: rgba(255,255,255,0.05);
+  --text: #ffffff;
+}
+
+*{ box-sizing:border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+body{
+  margin:0;
+  min-height:100vh;
+  background: radial-gradient(circle at top, var(--bg1), var(--bg2));
+  color: var(--text);
+}
+
+#app{
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+header{
+  text-align:center;
+  margin: 10px 0 16px;
+}
+h1{
+  margin: 0;
+  font-size: 56px;
+  letter-spacing: 0.5px;
+}
+.tagline{ opacity:0.75; margin-top:4px; }
+.statusLine{ margin-top:10px; opacity:0.9; font-size:14px; }
+
+.card{
+  background: var(--card);
+  border-radius: 22px;
+  padding: 16px;
+  margin-bottom: 14px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.h2{ font-size: 34px; font-weight: 800; margin: 0 0 6px; }
+.subtle{ opacity:0.7; font-size: 14px; }
+.privacy{ opacity:0.75; margin-top: 2px; font-size: 14px; }
+
+.rowBetween{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 10px;
+}
+
+.pill{
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: 14px;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.vibes{
+  margin-top: 12px;
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.vibes button{
+  padding: 16px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  touch-action: manipulation;
+}
+.vibes button.active{
+  background: rgba(125,240,194,0.28);
+  border-color: rgba(125,240,194,0.4);
+}
+
+#people, #wavesFeed{
+  list-style:none;
+  padding: 0;
+  margin: 12px 0 0;
+}
+
+#people li, .feed li{
+  display:flex;
+  gap: 12px;
+  padding: 12px;
+  margin-top: 10px;
+  background: var(--card2);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.avatar{
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.10);
+  flex: 0 0 auto;
+}
+
+.pName{ font-weight: 800; font-size: 18px; }
+.pSub{ opacity:0.8; margin-top:2px; }
+.pDist{ opacity:0.75; margin-top:6px; font-size: 14px; }
+
+#waveBtn{
+  width:100%;
+  padding: 18px 18px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(90deg, var(--accent1), var(--accent2));
+  color: #000;
+  font-size: 26px;
+  font-weight: 900;
+  margin: 14px 0 8px;
+  touch-action: manipulation;
+}
+
+.fineprint{
+  text-align:center;
+  opacity:0.7;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+/* ===== Modal (mobile safe) ===== */
+.hidden{ display:none !important; }
+
+.modalRoot{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: auto;
+}
+.modalBackdrop{
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.62);
+  pointer-events: auto;
+}
+.modalSheet{
+  position:absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  background: rgba(17,17,17,0.98);
+  border-radius: 24px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.10);
+  pointer-events: auto;
+  z-index: 10000;
+}
+
+.modalTitle{ font-size: 26px; font-weight: 900; margin-bottom: 4px; }
+.modalSub{ opacity:0.75; margin-bottom: 12px; }
+
+.modalSheet textarea{
+  width:100%;
+  height: 95px;
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  font-size: 18px;
+  outline: none;
+  resize: none;
+}
+
+.counter{
+  text-align:right;
+  font-size: 13px;
+  opacity: 0.65;
+  margin-top: 8px;
+}
+
+.modalSheet button{
+  width: 100%;
+  padding: 16px;
+  border-radius: 999px;
+  border: none;
+  font-size: 18px;
+  font-weight: 900;
+  margin-top: 10px;
+  touch-action: manipulation;
+}
+.modalSheet button.primary{
+  background: linear-gradient(90deg, var(--accent1), var(--accent2));
+  color:#000;
+}
+.modalSheet button.secondary{
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* =========================================
+   LIVE WAVES + PEOPLE LIST (BULLET FIX + UX)
+   ========================================= */
+
+/* kill any browser default bullets/margins */
+#people, #wavesFeed{
+  list-style: none;
+  padding-left: 0;
+}
+#people li::marker,
+#wavesFeed li::marker{
+  content: "";
+}
+
+/* ensure waves feed matches card style even if JS outputs plain text */
+#wavesFeed li{
+  display:flex;
+  gap: 12px;
+  align-items:flex-start;
+  padding: 14px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* optional: tighten spacing for waves */
+#wavesFeed{
+  margin-top: 12px;
+}
