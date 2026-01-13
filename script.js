@@ -1,0 +1,323 @@
+// script.js (ES module) — Near: Live screen + Wave send + Firestore feed
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import {
+  getAuth,
+  signInAnonymously,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  serverTimestamp,
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  limit
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+/* ===========================
+   FIREBASE CONFIG (YOUR PROJECT)
+   =========================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyA2ApGkST41s9U53GQIatv4FL8aCPVzeAM",
+  authDomain: "near-c7681.firebaseapp.com",
+  projectId: "near-c7681",
+  storageBucket: "near-c7681.firebasestorage.app",
+  messagingSenderId: "316318833624",
+  appId: "1:316318833624:web:480beb2c1909e23d1cf0ad",
+  measurementId: "G-98XYEKXLLT"
+};
+/* =========================== */
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* UI */
+const statusLine = document.getElementById("statusLine");
+const pillStatus = document.getElementById("pillStatus");
+const peopleList = document.getElementById("people");
+const vibeButtons = Array.from(document.querySelectorAll(".vibeBtn"));
+
+const waveBtn = document.getElementById("waveBtn");
+const waveModal = document.getElementById("waveModal");
+const waveText = document.getElementById("waveText");
+const count = document.getElementById("count");
+const sendBtn = document.getElementById("sendBtn");
+const laterBtn = document.getElementById("laterBtn");
+
+const wavesFeed = document.getElementById("wavesFeed");
+const wavesHint = document.getElementById("wavesHint");
+
+/* Theme packs (4 only) */
+const THEMES = {
+  city:  { bg1:"#2e3a3f", bg2:"#0b0f12", a1:"#6ee7b7", a2:"#7dd3fc" },
+  beach: { bg1:"#2b6b73", bg2:"#08161b", a1:"#fcd34d", a2:"#f59e0b" },
+  forest:{ bg1:"#2f5a43", bg2:"#06130c", a1:"#86efac", a2:"#34d399" },
+  space: { bg1:"#3a2f5a", bg2:"#05030a", a1:"#c4b5fd", a2:"#a78bfa" }
+};
+
+function setTheme(key){
+  const t = THEMES[key] || THEMES.city;
+  const r = document.documentElement;
+  r.style.setProperty("--bg1", t.bg1);
+  r.style.setProperty("--bg2", t.bg2);
+  r.style.setProperty("--accent1", t.a1);
+  r.style.setProperty("--accent2", t.a2);
+}
+
+vibeButtons.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    vibeButtons.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    setTheme(btn.dataset.theme);
+  }, { passive:true });
+});
+setTheme("city");
+
+/* People list (demo) */
+function kmMin1(km){
+  if (!Number.isFinite(km)) return "within 1 km away";
+  const safe = Math.max(1, km);
+  if (safe === 1) return "within 1 km away";
+  return `~${safe.toFixed(1)} km away`;
+}
+const DEMO_PEOPLE = [
+  { name:"Sam", age:54, bio:"Out for a walk", km:0.3 },
+  { name:"Jade", age:31, bio:"Coffee nearby", km:1.2 },
+  { name:"Michael", age:42, bio:"Taking it slow", km:3.4 },
+  { name:"Elena", age:27, bio:"Beach breeze", km:0.7 },
+  { name:"David", age:61, bio:"Just chillin", km:4.9 },
+];
+
+function renderPeople(arr){
+  peopleList.innerHTML = "";
+  arr.slice(0,5).forEach(p=>{
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <div class="avatar" aria-hidden="true"></div>
+      <div>
+        <div class="pName">${escapeHtml(p.name)}, ${p.age}</div>
+        <div class="pSub">${escapeHtml(p.bio)}</div>
+        <div class="pDist">${kmMin1(p.km)}</div>
+      </div>
+    `;
+    peopleList.appendChild(li);
+  });
+}
+renderPeople(DEMO_PEOPLE);
+
+/* Location (watch) */
+let lastGeo = null;
+let geoStarted = false;
+
+function startGeoWatch(){
+  if (geoStarted) return;
+  geoStarted = true;
+
+  if (!("geolocation" in navigator)) {
+    pillStatus.textContent = "No GPS";
+    return;
+  }
+
+  pillStatus.textContent = "Locating…";
+
+  navigator.geolocation.watchPosition(
+    (pos)=>{
+      lastGeo = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      pillStatus.textContent = "Up to date";
+      // if already signed in, refresh user doc occasionally
+      const u = auth.currentUser;
+      if (u) ensureUserDoc(u.uid).catch(()=>{});
+    },
+    (err)=>{
+      // Permission denied or unavailable
+      pillStatus.textContent = "Location off";
+      console.log("Geolocation error:", err);
+    },
+    { enableHighAccuracy:true, maximumAge:5000, timeout:15000 }
+  );
+}
+
+/* Auth + User doc */
+async function ensureUserDoc(uid){
+  const ref = doc(db, "users", uid);
+  const payload = {
+    lastSeen: serverTimestamp(),
+    name: "User"
+  };
+  if (lastGeo) { payload.lat = lastGeo.lat; payload.lng = lastGeo.lng; }
+  await setDoc(ref, payload, { merge:true });
+}
+
+/* Waves feed */
+let unsubWaves = null;
+
+function startWavesFeed(){
+  if (unsubWaves) return;
+
+  const qy = query(
+    collection(db, "waves"),
+    orderBy("createdAt", "desc"),
+    limit(20)
+  );
+
+  unsubWaves = onSnapshot(qy, (snap)=>{
+    wavesFeed.innerHTML = "";
+    const docs = snap.docs;
+
+    if (!docs.length) {
+      wavesHint.textContent = "No waves yet";
+      return;
+    }
+
+    wavesHint.textContent = `Showing ${docs.length} latest`;
+
+    docs.forEach(d=>{
+      const w = d.data();
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="avatar" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <div class="pName">${escapeHtml(w.theme || "city")}</div>
+          <div class="pSub">${escapeHtml(w.message || "")}</div>
+          <div class="pDist">${formatTime(w.createdAt)}</div>
+        </div>
+      `;
+      wavesFeed.appendChild(li);
+    });
+  }, (err)=>{
+    console.log("Waves feed error:", err);
+    wavesHint.textContent = "Feed error";
+  });
+}
+
+/* Modal */
+function openModal(){
+  waveModal.classList.remove("hidden");
+  waveModal.setAttribute("aria-hidden", "false");
+  // delay focus slightly for mobile
+  setTimeout(()=> waveText.focus({ preventScroll:true }), 50);
+}
+function closeModal(){
+  waveModal.classList.add("hidden");
+  waveModal.setAttribute("aria-hidden", "true");
+  waveText.value = "";
+  count.textContent = "0";
+  sendBtn.disabled = false;
+  sendBtn.textContent = "Send";
+}
+
+waveText.addEventListener("input", ()=>{
+  count.textContent = String(waveText.value.length);
+}, { passive:true });
+
+waveBtn.addEventListener("click", openModal, { passive:true });
+
+laterBtn.addEventListener("click", closeModal);
+
+waveModal.addEventListener("click", (e)=>{
+  // click backdrop closes
+  const t = e.target;
+  if (t && t.dataset && t.dataset.close === "1") closeModal();
+});
+
+/* Send wave */
+sendBtn.addEventListener("click", async ()=>{
+  const text = (waveText.value || "").trim();
+  if (!text) return;
+
+  const u = auth.currentUser;
+  if (!u) {
+    alert("Not signed in");
+    return;
+  }
+
+  sendBtn.disabled = true;
+  sendBtn.textContent = "Sending…";
+
+  try{
+    const activeTheme =
+      vibeButtons.find(b=>b.classList.contains("active"))?.dataset.theme || "city";
+
+    await addDoc(collection(db, "waves"), {
+      uid: u.uid,
+      message: text,
+      createdAt: serverTimestamp(),
+      lat: lastGeo?.lat ?? null,
+      lng: lastGeo?.lng ?? null,
+      theme: activeTheme
+    });
+
+    closeModal();
+  }catch(err){
+    console.log("Send wave error:", err);
+    alert("Send failed — check console");
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Send";
+  }
+});
+
+/* Boot */
+statusLine.textContent = "Signing in…";
+startGeoWatch();
+
+(async function bootAuth(){
+  try{
+    await signInAnonymously(auth);
+  }catch(err){
+    console.log("Auth sign-in error:", err);
+    alert("Sign-in failed — check console");
+    statusLine.textContent = "Sign-in failed";
+  }
+})();
+
+onAuthStateChanged(auth, async (user)=>{
+  if (!user){
+    statusLine.textContent = "Not signed in";
+    return;
+  }
+
+  statusLine.textContent = "Finding people near you…";
+
+  try{
+    await ensureUserDoc(user.uid);
+    statusLine.textContent = "Ready";
+  }catch(err){
+    console.log("User doc write error:", err);
+    statusLine.textContent = "Ready (limited)";
+  }
+
+  startWavesFeed();
+});
+
+/* Helpers */
+function escapeHtml(str){
+  return String(str ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function formatTime(ts){
+  // Firestore Timestamp -> "just now" / local date
+  try{
+    if (!ts) return "";
+    const d = ts.toDate ? ts.toDate() : null;
+    if (!d) return "";
+    const diff = Date.now() - d.getTime();
+    if (diff < 30_000) return "just now";
+    if (diff < 60_000) return "under a minute";
+    const mins = Math.floor(diff/60_000);
+    if (mins < 60) return `${mins} min ago`;
+    return d.toLocaleString();
+  }catch{
+    return "";
+  }
+}
