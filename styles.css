@@ -124,3 +124,41 @@ header {
   background: transparent;
   color: #aaa;
 }
+/* --- FIX: taps not reaching Send (overlay issue) --- */
+
+/* your modal/sheet container */
+#waveModal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+/* if you have a dim/blur backdrop layer */
+#waveModal .backdrop,
+#waveModal .overlay,
+#waveBackdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* IMPORTANT: backdrop must not steal taps */
+}
+
+/* the actual card/sheet that contains input + buttons */
+#waveModal .sheet,
+#waveModal .modal,
+#waveSheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  pointer-events: auto;
+}
+
+/* the Send button MUST be above everything */
+#sendWaveBtn {
+  position: relative;
+  z-index: 10001;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
