@@ -1,0 +1,64 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Near</title>
+  <link rel="stylesheet" href="./styles.css?v=1">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Near</h1>
+      <div class="tagline">Real people. Near you.</div>
+      <div id="statusLine" class="statusLine">Signing in…</div>
+    </header>
+
+    <section class="card">
+      <div class="rowBetween">
+        <div>
+          <div class="h2">Choose your vibe</div>
+          <div class="subtle">4 themes. No clutter.</div>
+        </div>
+        <div id="pillStatus" class="pill">Starting…</div>
+      </div>
+
+      <div class="vibes">
+        <button class="vibeBtn active" data-theme="city">City (Night)</button>
+        <button class="vibeBtn" data-theme="beach">Beach</button>
+        <button class="vibeBtn" data-theme="forest">Forest</button>
+        <button class="vibeBtn" data-theme="space">Space</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="h2">People Near</div>
+      <div class="privacy">Distances shown as a minimum of <b>1 km</b> for privacy.</div>
+      <ul id="people"></ul>
+    </section>
+
+    <button id="waveBtn">Wave 👋</button>
+    <div class="fineprint">One real message • No pressure • Block or decline anytime</div>
+
+    <section class="card">
+      <div class="h2">Live Waves</div>
+      <ul id="wavesFeed" class="feed"></ul>
+    </section>
+  </div>
+
+  <div id="waveModal" class="modalRoot hidden">
+    <div class="modalBackdrop"></div>
+    <div class="modalSheet">
+      <div class="modalTitle">Say something real</div>
+      <div class="modalSub">One message. Kind. Honest. No performance.</div>
+      <textarea id="waveText" maxlength="250" placeholder="Write one message..."></textarea>
+      <div class="counter"><span id="count">0</span>/250</div>
+      <button id="sendBtn" class="primary">Send</button>
+      <button id="laterBtn" class="secondary">Maybe later</button>
+    </div>
+  </div>
+
+  <script type="module" src="./script.js?v=1"></script>
+</body>
+</html>
