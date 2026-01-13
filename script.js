@@ -19,7 +19,7 @@ import {
    FIREBASE CONFIG (REAL)
    =========================== */
 const firebaseConfig = {
-  apiKey: "AIzaSyXXXXXXXXXXXX",
+  apiKey: "AIzaSyA_REAL_KEY_HERE"
   authDomain: "near-c7681.firebaseapp.com",
   projectId: "near-c7681",
   storageBucket: "near-c7681.appspot.com",
