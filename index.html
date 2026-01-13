@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Near</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <h1 class="logo">Near</h1>
+      <p class="tagline">Real people. Near you.</p>
+    </div>
+    <div class="status" id="status">Getting your location…</div>
+  </header>
+
+  <main class="wrap">
+    <!-- VIBE CHIPS -->
+    <section class="card vibe-card">
+      <div class="card-title">Choose your vibe</div>
+      <div class="chips" id="vibeChips">
+        <button class="chip is-active" data-theme="city">City (Night)</button>
+        <button class="chip" data-theme="beach">Beach</button>
+        <button class="chip" data-theme="forest">Forest</button>
+        <button class="chip" data-theme="space">Space</button>
+      </div>
+      <div class="subtle" id="nearCount">Finding people near you…</div>
+    </section>
+
+    <!-- PEOPLE LIST -->
+    <section class="card people-card">
+      <div class="card-title">People Near</div>
+      <div class="subtle">Distances shown as a minimum of <b>1 km</b> for privacy.</div>
+
+      <div class="people" id="peopleList"></div>
+    </section>
+  </main>
+
+  <!-- WAVE BAR -->
+  <footer class="wavebar" id="waveBar">
+    <button class="wavebtn" id="waveBtn" disabled>Wave 👋</button>
+    <div class="wavehint">One real message • No pressure • Block or decline anytime</div>
+  </footer>
+
+  <!-- MESSAGE GATE -->
+  <div class="overlay hidden" id="gateOverlay" aria-hidden="true">
+    <div class="gate">
+      <div class="gate-title">Say something real</div>
+      <div class="gate-sub">One message. Kind. Honest. No performance.</div>
+
+      <textarea id="gateInput" maxlength="250" placeholder="Write one message… (min 25 characters)"></textarea>
+
+      <div class="gate-row">
+        <div class="counter"><span id="counter">0</span>/250</div>
+        <div class="minnote">Minimum protects intention.</div>
+      </div>
+
+      <button class="primary" id="sendBtn" disabled>Send</button>
+      <button class="ghost" id="laterBtn">Maybe later</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
