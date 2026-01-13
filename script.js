@@ -1,5 +1,13 @@
 // script.js (ES module)
-
+window.onerror = function (msg, src, line, col, err) {
+  alert(
+    "JS ERROR:\n" +
+    msg +
+    "\nline: " + line +
+    "\ncol: " + col +
+    "\n" + (err?.message || "")
+  );
+};
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 import {
