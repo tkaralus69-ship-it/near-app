@@ -1,0 +1,113 @@
+<!-- index.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Near</title>
+  <meta name="theme-color" content="#0b0f16" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <button class="iconbtn" id="backBtn" aria-label="Back" title="Back">
+        <span class="icon">✕</span>
+      </button>
+
+      <div class="brand">
+        <div class="brand-title">Near</div>
+        <div class="brand-sub">Real people. Near you.</div>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="iconbtn" id="shareBtn" aria-label="Share" title="Share">
+          <span class="icon">⤴</span>
+        </button>
+        <button class="iconbtn" id="bookmarkBtn" aria-label="Bookmark" title="Bookmark">
+          <span class="icon">🔖</span>
+        </button>
+        <button class="iconbtn" id="moreBtn" aria-label="More" title="More">
+          <span class="icon">⋮</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="hero">
+        <h1 class="title">Near</h1>
+        <p class="tagline">Real people. Near you.</p>
+
+        <div class="vibe-card">
+          <div class="vibe-head">
+            <div class="vibe-label">Choose your vibe</div>
+            <div class="vibe-status" id="statusText">Finding people near you…</div>
+          </div>
+
+          <div class="vibe-tabs" role="tablist" aria-label="Choose your vibe">
+            <button class="tab is-active" data-theme="city" role="tab" aria-selected="true">City (Night)</button>
+            <button class="tab" data-theme="beach" role="tab" aria-selected="false">Beach</button>
+            <button class="tab" data-theme="forest" role="tab" aria-selected="false">Forest</button>
+            <button class="tab" data-theme="space" role="tab" aria-selected="false">Space</button>
+          </div>
+
+          <div class="near-count" id="nearCount">—</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">People Near</div>
+        <div class="panel-sub">Distances shown as a minimum of <strong>1 km</strong> for privacy.</div>
+
+        <div class="list" id="peopleList" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <button class="cta" id="waveBtn" type="button">
+        <span class="cta-text">Wave</span>
+        <span class="cta-emoji" aria-hidden="true">👋</span>
+      </button>
+
+      <div class="fineprint">
+        One real message • No pressure • Block or decline anytime
+      </div>
+    </footer>
+
+    <!-- Message Gate -->
+    <div class="overlay is-hidden" id="gateOverlay" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+      <div class="sheet">
+        <div class="sheet-top">
+          <div class="sheet-title" id="gateTitle">Say something real</div>
+          <div class="sheet-sub">One message. Kind. Honest. No performance.</div>
+        </div>
+
+        <div class="sheet-body">
+          <textarea
+            id="gateInput"
+            maxlength="250"
+            placeholder="Write one message… (max 250 characters)"
+            rows="4"
+          ></textarea>
+
+          <div class="sheet-row">
+            <div class="counter" id="gateCounter">0 / 250</div>
+            <div class="hint">Minimum protects intention.</div>
+          </div>
+        </div>
+
+        <div class="sheet-actions">
+          <button class="btn primary" id="gateSend" type="button">Send</button>
+          <button class="btn ghost" id="gateLater" type="button">Maybe later</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast is-hidden" id="toast" aria-live="polite"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+  </html>
