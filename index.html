@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Near</title>
+  <link rel="stylesheet" href="styles.css" />
+  <meta name="theme-color" content="#0b0f16" />
+</head>
+
+<body>
+  <div id="app" class="theme theme-city">
+    <!-- subtle animated background -->
+    <div class="bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <h1 class="logo">Near</h1>
+        <p class="tagline">Real people. Near you.</p>
+        <p class="subline" id="nearCount">Finding people near you…</p>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- VIBE / THEME -->
+      <section class="card vibeCard">
+        <div class="vibeRow">
+          <div>
+            <div class="cardTitle">Choose your vibe</div>
+            <div class="cardHint">4 themes. No clutter.</div>
+          </div>
+          <div class="statusPill" id="statusPill">Up to date</div>
+        </div>
+
+        <div class="vibes" role="tablist" aria-label="Choose your vibe">
+          <button class="vibeBtn active" data-theme="city" role="tab" aria-selected="true">City (Night)</button>
+          <button class="vibeBtn" data-theme="beach" role="tab" aria-selected="false">Beach</button>
+          <button class="vibeBtn" data-theme="forest" role="tab" aria-selected="false">Forest</button>
+          <button class="vibeBtn" data-theme="space" role="tab" aria-selected="false">Space</button>
+        </div>
+
+        <div class="dots" aria-hidden="true">
+          <span class="dot active" data-dot="city"></span>
+          <span class="dot" data-dot="beach"></span>
+          <span class="dot" data-dot="forest"></span>
+          <span class="dot" data-dot="space"></span>
+        </div>
+      </section>
+
+      <!-- NEAR MOMENTS -->
+      <section class="card momentsCard" id="momentsCard" hidden>
+        <div class="momentsHeader">
+          <div>
+            <div class="cardTitle" id="momentTitle">You crossed paths</div>
+            <div class="cardHint" id="momentSubtitle">Earlier today • Nearby</div>
+          </div>
+          <button class="ghostBtn" id="dismissMoment" aria-label="Dismiss moment">✕</button>
+        </div>
+
+        <div id="momentPeople" class="momentPeople"></div>
+
+        <div class="momentActions" id="momentActions">
+          <button class="pillBtn yes" id="btnYesDiscreet">Yes, discreetly</button>
+          <button class="pillBtn no" id="btnNoThanks">No, thanks</button>
+        </div>
+      </section>
+
+      <!-- PEOPLE NEAR -->
+      <section class="card peopleCard">
+        <div class="peopleHeader">
+          <div class="cardTitle">People Near</div>
+          <div class="cardHint">Distances shown as a minimum of <b>1 km</b> for privacy.</div>
+        </div>
+
+        <div id="peopleList" class="peopleList">
+          <!-- injected -->
+        </div>
+      </section>
+
+      <div class="footerNote">
+        One real message • No pressure • Block or decline anytime
+      </div>
+    </main>
+
+    <!-- WAVE BAR -->
+    <div class="waveBar">
+      <button id="waveBtn" class="waveBtn" type="button">
+        Wave 👋
+      </button>
+    </div>
+
+    <!-- ONE MESSAGE MODAL -->
+    <div class="modalBackdrop" id="modalBackdrop" hidden></div>
+    <div class="modal" id="messageModal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalHeader">
+        <div>
+          <div class="modalTitle" id="modalTitle">Say something real</div>
+          <div class="modalHint">One message. Kind. Honest. No performance.</div>
+        </div>
+      </div>
+
+      <textarea
+        id="messageInput"
+        class="messageInput"
+        placeholder="Write one message… (max 250 characters)"
+        maxlength="250"
+      ></textarea>
+
+      <div class="modalMeta">
+        <span id="charCount">0 / 250</span>
+        <span class="minHint">Minimum protects intention.</span>
+      </div>
+
+      <div class="modalActions">
+        <button class="pillBtn yes" id="sendBtn">Send</button>
+        <button class="pillBtn no" id="maybeLaterBtn">Maybe later</button>
+      </div>
+
+      <div class="modalFinePrint" id="modalFinePrint">
+        This only sends if recognition is mutual.
+      </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+  </div>
+</body>
+</html>
