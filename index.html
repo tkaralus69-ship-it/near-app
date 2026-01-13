@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Near</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <button class="iconBtn" id="closeBtn" aria-label="Close">✕</button>
+      <div class="topbarTitle">
+        <div class="brandSmall">Near</div>
+        <div class="tagSmall">Real people. Near you.</div>
+      </div>
+      <div class="topbarRight">
+        <button class="iconBtn" id="shareBtn" aria-label="Share">⤴</button>
+        <button class="iconBtn" id="bookmarkBtn" aria-label="Bookmark">🔖</button>
+        <button class="iconBtn" id="moreBtn" aria-label="More">⋮</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="hero">
+        <div class="brand">Near</div>
+        <div class="tag">Real people. Near you.</div>
+
+        <div class="metaRow">
+          <div class="count" id="countText">Finding people near you…</div>
+        </div>
+
+        <section class="panel">
+          <div class="panelHead">
+            <div class="panelTitle">Choose your vibe</div>
+            <div class="panelStatus" id="statusText">Finding people near you…</div>
+          </div>
+
+          <div class="vibes" role="tablist" aria-label="Choose your vibe">
+            <button class="pill active" data-theme="city" role="tab" aria-selected="true">City (Night)</button>
+            <button class="pill" data-theme="beach" role="tab" aria-selected="false">Beach</button>
+            <button class="pill" data-theme="forest" role="tab" aria-selected="false">Forest</button>
+            <button class="pill" data-theme="space" role="tab" aria-selected="false">Space</button>
+          </div>
+
+          <div class="dots" aria-hidden="true">
+            <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+        </section>
+      </div>
+
+      <section class="section">
+        <div class="sectionTitle">People Near</ztuff</div>
+        <div class="sectionSub">
+          Distances shown as a minimum of <b>1 km</b> for privacy.
+        </div>
+
+        <div class="cards" id="cards"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <button class="waveBtn" id="waveBtn">Wave 👋</button>
+      <div class="footerNote">One real message • No pressure • Block or decline anytime</div>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modalOverlay hidden" id="modalOverlay" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modalHead">
+          <div class="modalTitle" id="modalTitle">Say something real</div>
+          <button class="iconBtn" id="modalClose" aria-label="Close modal">✕</button>
+        </div>
+
+        <div class="modalSub">One message. Kind. Honest. No performance.</div>
+
+        <textarea
+          id="messageInput"
+          class="messageInput"
+          rows="5"
+          maxlength="250"
+          placeholder="Write one message… (max 250 characters)"></textarea>
+
+        <div class="modalBottom">
+          <div class="charCount" id="charCount">0 / 250</div>
+          <div class="miniNote">Minimum protects intention.</div>
+        </div>
+
+        <button class="primaryBtn" id="sendBtn" disabled>Send</button>
+        <button class="ghostBtn" id="laterBtn">Maybe later</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
