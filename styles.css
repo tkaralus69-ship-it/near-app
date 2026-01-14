@@ -1,0 +1,157 @@
+:root{
+  --bg1:#2e3a3f;
+  --bg2:#0b0f12;
+  --accent1:#6ee7b7;
+  --accent2:#7dd3fc;
+  --text:#ffffff;
+
+  --card: rgba(0,0,0,0.42);
+  --card2: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.10);
+}
+
+*{ box-sizing:border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  color: var(--text);
+  background: radial-gradient(circle at top, var(--bg1), var(--bg2));
+  overflow-x: hidden;
+}
+
+/* ===== BACKGROUND VIBE IMAGE (RESTORES VIBE PICS) ===== */
+.bgVibe{
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: saturate(1.1) contrast(1.05);
+  transform: scale(1.03);
+}
+
+.bgShade{
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  /* soft “glass” shade so text is readable but image stays clear */
+  background:
+    radial-gradient(circle at 30% 0%, rgba(0,0,0,0.10), rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.70)),
+    linear-gradient(to bottom, rgba(0,0,0,0.18), rgba(0,0,0,0.72));
+}
+
+/* ===== LAYOUT ===== */
+#app{
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+header{
+  text-align:center;
+  margin: 8px 0 14px;
+}
+h1{
+  margin: 0;
+  font-size: 64px;
+  letter-spacing: 0.5px;
+  font-weight: 900;
+}
+.statusLine{
+  margin-top: 6px;
+  font-size: 18px;         /* not “small print” */
+  opacity: 0.9;
+}
+
+/* ===== PROMO GRID ===== */
+.promoGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 10px 0 14px;
+}
+.promoCard{
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 28px;
+  padding: 18px;
+  min-height: 150px;
+  color: #fff;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.12), rgba(0,0,0,0.78)),
+    var(--promoImage, rgba(0,0,0,0.35));
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 14px 44px rgba(0,0,0,0.55);
+  cursor: pointer;
+  text-align: left;
+  overflow: hidden;
+}
+.promoWide{
+  grid-column: 1 / -1;
+  min-height: 170px;
+}
+.promoKicker{
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  font-size: 14px;
+  opacity: 0.9;
+}
+.promoTitle{
+  margin-top: 10px;
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1.02;
+}
+.promoTitle b{
+  color: var(--accent1);
+}
+.promoSub{
+  margin-top: 10px;
+  font-size: 20px;
+  opacity: 0.92;
+}
+.promoPill{
+  position:absolute;
+  top: 16px;
+  right: 16px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 900;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.16);
+  backdrop-filter: blur(10px);
+}
+
+/* ===== CARDS ===== */
+.card{
+  background: var(--card);
+  border-radius: 30px;
+  padding: 18px;
+  margin-bottom: 14px;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.55);
+}
+
+.h2{
+  font-size: 44px;
+  font-weight: 900;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+
+.rowBetween{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 12px;
+}
+
+.pill{
+  padding: 12px 16px;
+  border-radius: 999px;
+  background:
