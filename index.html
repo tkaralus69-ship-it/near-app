@@ -1,0 +1,90 @@
+<!-- index.html (FULL / LOCKED) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Near</title>
+  <link rel="stylesheet" href="./styles.css?v=4">
+</head>
+
+<body>
+  <!-- Background vibe image -->
+  <div class="bgVibe" aria-hidden="true"></div>
+  <div class="bgShade" aria-hidden="true"></div>
+
+  <div id="app">
+    <header>
+      <h1>Near</h1>
+      <div class="tagline">Real people. Near you.</div>
+      <div id="statusLine" class="statusLine">Signing in…</div>
+    </header>
+
+    <!-- Vibes -->
+    <section class="card" id="vibeCard">
+      <div class="rowBetween">
+        <div class="h2">Choose your vibe</div>
+        <div id="pillStatus" class="pill">Starting…</div>
+      </div>
+
+      <div class="vibes">
+        <button class="vibeBtn active" data-theme="city" type="button">City</button>
+        <button class="vibeBtn" data-theme="tech" type="button">Tech</button>
+        <button class="vibeBtn" data-theme="nature" type="button">Nature</button>
+        <button class="vibeBtn" data-theme="fitness" type="button">Fitness</button>
+        <button class="vibeBtn" data-theme="beach" type="button">Beach</button>
+        <button class="vibeBtn" data-theme="food" type="button">Food</button>
+      </div>
+    </section>
+
+    <!-- Promo tiles -->
+    <section class="promoGrid" aria-label="Quick actions">
+      <button class="promoCard" data-jump="peopleCard" type="button">
+        <div class="promoTitle">Choose someone <b>Near</b></div>
+      </button>
+
+      <button class="promoCard" data-jump="waveBtn" type="button">
+        <div class="promoTitle">Send a <b>Wave</b></div>
+      </button>
+
+      <button class="promoCard" data-jump="wavesCard" type="button">
+        <div class="promoTitle">See <b>Live</b> waves</div>
+      </button>
+    </section>
+
+    <!-- People -->
+    <section class="card" id="peopleCard">
+      <div class="h2">People Near</div>
+      <div class="privacy">Distances shown as a minimum of <b>1 km</b> for privacy.</div>
+      <ul id="people"></ul>
+    </section>
+
+    <button id="waveBtn" type="button">Wave 👋</button>
+
+    <!-- Live feed -->
+    <section class="card" id="wavesCard">
+      <div class="rowBetween">
+        <div class="h2">Live Waves</div>
+      </div>
+      <ul id="wavesFeed" class="feed"></ul>
+    </section>
+  </div>
+
+  <!-- Wave modal -->
+  <div id="waveModal" class="modalRoot hidden" aria-hidden="true">
+    <div class="modalBackdrop" aria-label="Close"></div>
+
+    <div class="modalSheet" role="dialog" aria-modal="true" aria-label="Send a wave">
+      <div class="modalTitle">Say something real</div>
+
+      <textarea id="waveText" maxlength="250" placeholder="Write one message..."></textarea>
+      <div class="counter"><span id="count">0</span>/250</div>
+
+      <button id="sendBtn" class="primary" type="button">Send</button>
+      <button id="laterBtn" class="secondary" type="button">Maybe later</button>
+    </div>
+  </div>
+
+  <script type="module" src="./script.js?v=4"></script>
+</body>
+</html>
