@@ -1,1 +1,8 @@
-
+const VIBE_IMAGES = {
+  city:   "img/city.jpg",
+  nature: "img/nature.jpg",
+  beach:  "img/beach.jpg",
+  fitness:"img/fitness.jpg",
+  tech:   "img/tech.jpg",
+  food:   "img/food.jpg"
+};
