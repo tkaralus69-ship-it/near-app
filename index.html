@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Near</title>
+  <link rel="stylesheet" href="./styles.css?v=20">
+</head>
+
+<body>
+  <!-- Background vibe image -->
+  <div class="bgVibe" aria-hidden="true"></div>
+  <div class="bgShade" aria-hidden="true"></div>
+
+  <div id="app">
+    <header>
+      <h1>Near</h1>
+      <div class="tagline">Real people. Near you.</div>
+      <div id="statusLine" class="statusLine">Signing in…</div>
+    </header>
+
+    <!-- ✅ VIBES (NO BIG CARD) -->
+    <section id="vibesWrap" aria-label="Choose your vibe">
+      <div class="vibesHead">
+        <div class="h2">Choose your vibe</div>
+        <div id="pillStatus" class="pill">Starting…</div>
+      </div>
+
+      <div class="vibes">
+        <button class="vibeBtn active" data-theme="city" type="button">City</button>
+        <button class="vibeBtn" data-theme="tech" type="button">Tech</button>
+        <button class="vibeBtn" data-theme="nature" type="button">Nature</button>
+        <button class="vibeBtn" data-theme="fitness" type="button">Fitness</button>
+        <button class="vibeBtn" data-theme="beach" type="button">Beach</button>
+        <button class="vibeBtn" data-theme="food" type="button">Food</button>
+      </div>
+    </section>
+
+    <!-- ✅ Subtle banner area (trial countdown / paywall prompt) -->
+    <section id="bannerWrap" class="bannerWrap" aria-live="polite"></section>
+
+    <!-- Promo tiles -->
+    <section class="promoGrid" aria-label="Quick actions">
+      <button class="promoCard" data-jump="peopleCard" type="button">
+        <div class="promoTitle">Choose someone <b>Near</b></div>
+      </button>
+
+      <button class="promoCard" data-jump="waveBtn" type="button">
+        <div class="promoTitle">Send a <b>Wave</b></div>
+      </button>
+
+      <button class="promoCard" data-jump="wavesCard" type="button">
+        <div class="promoTitle">See <b>Live</b> waves</div>
+      </button>
+    </section>
+
+    <!-- People -->
+    <section class="card" id="peopleCard">
+      <div class="rowBetween">
+        <div>
+          <div class="h2">People Near</div>
+          <div class="privacy">Distances shown as a minimum of <b>1 km</b> for privacy.</div>
+        </div>
+
+        <!-- optional quick link -->
+        <button id="manageBtn" class="miniBtn" type="button">Plans</button>
+      </div>
+
+      <ul id="people"></ul>
+    </section>
+
+    <button id="waveBtn" type="button">Wave 👋</button>
+
+    <!-- Live feed -->
+    <section class="card" id="wavesCard">
+      <div class="rowBetween">
+        <div class="h2">Live Waves</div>
+      </div>
+      <ul id="wavesFeed" class="feed"></ul>
+    </section>
+  </div>
+
+  <!-- Wave modal -->
+  <div id="waveModal" class="modalRoot hidden" aria-hidden="true">
+    <div class="modalBackdrop" type="button" aria-label="Close"></div>
+
+    <div class="modalSheet" role="dialog" aria-modal="true" aria-label="Send a wave">
+      <div class="modalTitle">Say something real</div>
+
+      <textarea id="waveText" maxlength="250" placeholder="Write one message..."></textarea>
+      <div class="counter"><span id="count">0</span>/250</div>
+
+      <button id="sendBtn" class="primary" type="button">Send</button>
+      <button id="laterBtn" class="secondary" type="button">Maybe later</button>
+    </div>
+  </div>
+
+  <!-- ✅ PAYWALL / PLANS modal -->
+  <div id="plansModal" class="modalRoot hidden" aria-hidden="true">
+    <div class="modalBackdrop" data-close="plans" aria-label="Close"></div>
+
+    <div class="modalSheet" role="dialog" aria-modal="true" aria-label="Plans">
+      <div class="modalTitle">Choose how you stay Near</div>
+      <div class="modalSub">
+        <span class="brandMini">PEOPLE b4 PROFIT</span><br/>
+        We don’t need you to find “the one”.<br/>
+        You can just find the one for right now… or just have a conversation.<br/>
+        We’re here for you. We are Near.
+      </div>
+
+      <div id="plansState" class="plansState"></div>
+
+      <div class="planGrid">
+        <button id="planMonthly" class="planCard" type="button">
+          <div class="planTop">
+            <div class="planName">$5 / month</div>
+            <div class="planTag">Full access</div>
+          </div>
+          <div class="planBody">Simple. Fair. Cancel anytime.</div>
+        </button>
+
+        <button id="planYearly" class="planCard" type="button">
+          <div class="planTop">
+            <div class="planName">$50 / year</div>
+            <div class="planTag">Full access</div>
+          </div>
+          <div class="planBody">Best value. One payment. Done.</div>
+        </button>
+      </div>
+
+      <div class="finePrint">
+        Both plans are <b>full access</b>. No add-ons. No ads. No nonsense.
+      </div>
+
+      <button id="feedbackBtn" class="secondary" type="button">Need more time? Give us honest feedback → +7 days</button>
+      <button class="secondary" data-close="plans" type="button">Maybe later</button>
+    </div>
+  </div>
+
+  <!-- ✅ FEEDBACK modal -->
+  <div id="feedbackModal" class="modalRoot hidden" aria-hidden="true">
+    <div class="modalBackdrop" data-close="feedback" aria-label="Close"></div>
+
+    <div class="modalSheet" role="dialog" aria-modal="true" aria-label="Feedback">
+      <div class="modalTitle">Give it to us straight</div>
+      <div class="modalSub">
+        Good or bad — we can take it.<br/>
+        As a thank you, we’ll give you <b>7 more days</b> of full access.
+      </div>
+
+      <textarea id="feedbackText" maxlength="500" placeholder="What felt good? What felt off? What would make Near better?"></textarea>
+      <div class="counter"><span id="fbCount">0</span>/500</div>
+
+      <button id="submitFeedbackBtn" class="primary" type="button">Submit feedback + unlock 7 more days</button>
+      <button class="secondary" data-close="feedback" type="button">Maybe later</button>
+    </div>
+  </div>
+
+  <!-- ✅ TRIAL ENDED gate -->
+  <div id="gateModal" class="modalRoot hidden" aria-hidden="true">
+    <div class="modalBackdrop" data-close="gate" aria-label="Close"></div>
+
+    <div class="modalSheet" role="dialog" aria-modal="true" aria-label="Trial ended">
+      <div class="modalTitle">Your free time is up</div>
+      <div class="modalSub">
+        You’ve had full access. No tricks.<br/>
+        If you want to keep going, choose a plan below.<br/>
+        Both are full access.
+      </div>
+
+      <div class="planGrid">
+        <button id="gateMonthly" class="planCard" type="button">
+          <div class="planTop">
+            <div class="planName">$5 / month</div>
+            <div class="planTag">Full access</div>
+          </div>
+          <div class="planBody">Keep it simple.</div>
+        </button>
+
+        <button id="gateYearly" class="planCard" type="button">
+          <div class="planTop">
+            <div class="planName">$50 / year</div>
+            <div class="planTag">Full access</div>
+          </div>
+          <div class="planBody">One payment. Best value.</div>
+        </button>
+      </div>
+
+      <button class="secondary" data-close="gate" type="button">Not now</button>
+    </div>
+  </div>
+
+  <script type="module" src="./script.js?v=20"></script>
+</body>
+</html>
