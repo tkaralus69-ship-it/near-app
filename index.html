@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Near</title>
+  <link rel="stylesheet" href="./styles.css?v=100" />
+</head>
+
+<body>
+  <div class="bgVibe" aria-hidden="true"></div>
+  <div class="overlay" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="brand">
+      <div class="logo">Near</div>
+      <div class="tag">Real people. Near you.</div>
+      <div class="sub">Ready.</div>
+    </div>
+
+    <div class="topRight">
+      <button id="plansBtn" class="pillBtn" type="button">Plans</button>
+      <div id="pillStatus" class="pill">Starting…</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="statusLine" class="status">Loading…</div>
+
+    <h1 class="h1">Choose your vibe</h1>
+
+    <div class="vibes">
+      <button class="vibeBtn active" data-theme="city" type="button">City</button>
+      <button class="vibeBtn" data-theme="tech" type="button">Tech</button>
+      <button class="vibeBtn" data-theme="nature" type="button">Nature</button>
+      <button class="vibeBtn" data-theme="fitness" type="button">Fitness</button>
+      <button class="vibeBtn" data-theme="beach" type="button">Beach</button>
+      <button class="vibeBtn" data-theme="food" type="button">Food</button>
+    </div>
+
+    <div class="promoRow">
+      <button id="chooseBtn" class="promo" type="button">Choose<br/>someone<br/>Near</button>
+      <button id="waveBtn" class="promo" type="button">Send a<br/>Wave</button>
+      <button id="liveBtn" class="promo" type="button">See Live<br/>waves</button>
+    </div>
+
+    <section class="panel">
+      <div class="panelTitle">
+        <div>
+          <div class="titleBig">People Near</div>
+          <div class="muted">Distances shown as a minimum of <b>1 km</b> for privacy.</div>
+        </div>
+      </div>
+
+      <ul id="people" class="people"></ul>
+    </section>
+
+    <section class="panel">
+      <div class="panelTitle">
+        <div>
+          <div class="titleBig">Live Waves</div>
+          <div class="muted">Short. Kind. Real-time.</div>
+        </div>
+      </div>
+
+      <ul id="wavesFeed" class="people"></ul>
+    </section>
+  </main>
+
+  <!-- WAVE MODAL -->
+  <div id="waveModal" class="modal hidden" aria-hidden="true">
+    <div class="modalBackdrop" data-close="wave"></div>
+    <div class="modalCard">
+      <div class="modalTitle">Send a Wave 👋</div>
+      <div class="muted">Short message. No pressure.</div>
+
+      <textarea id="waveText" maxlength="140" placeholder="Say something kind…"></textarea>
+      <div class="countRow"><span id="count">0</span>/140</div>
+
+      <div class="modalActions">
+        <button id="laterBtn" class="secondary" type="button">Maybe later</button>
+        <button id="sendBtn" class="primary" type="button">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANS MODAL (no payments yet — just transparent) -->
+  <div id="plansModal" class="modal hidden" aria-hidden="true">
+    <div class="modalBackdrop" data-close="plans"></div>
+    <div class="modalCard">
+      <div class="modalTitle">Choose how you stay Near</div>
+      <div class="muted" id="plansState">We’re still building. No payments will be taken yet.</div>
+
+      <div class="planRow">
+        <div class="planCard">
+          <div class="planTop">$5 / month</div>
+          <div class="planMid">Full access</div>
+          <div class="planBot">Simple. Fair. Cancel anytime.</div>
+        </div>
+        <div class="planCard">
+          <div class="planTop">$50 / year</div>
+          <div class="planMid">Full access</div>
+          <div class="planBot">Best value. One payment. Done.</div>
+        </div>
+      </div>
+
+      <div class="muted small">
+        Both plans are full access. No add-ons. No ads. No nonsense.
+      </div>
+
+      <div class="modalActions">
+        <button id="closePlans" class="secondary" type="button">Not now</button>
+        <button id="feedbackBtn" class="primary" type="button">Give feedback (+7 days)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK MODAL -->
+  <div id="feedbackModal" class="modal hidden" aria-hidden="true">
+    <div class="modalBackdrop" data-close="feedback"></div>
+    <div class="modalCard">
+      <div class="modalTitle">Honest feedback</div>
+      <div class="muted">Good or bad — we can take it. You’ll get +7 days.</div>
+
+      <textarea id="feedbackText" maxlength="400" placeholder="Tell us what you think…"></textarea>
+      <div class="countRow"><span id="fbCount">0</span>/400</div>
+
+      <div class="modalActions">
+        <button id="cancelFeedback" class="secondary" type="button">Cancel</button>
+        <button id="submitFeedbackBtn" class="primary" type="button">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./script.js?v=100"></script>
+</body>
+</html>
