@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile • Near</title>
+  <link rel="stylesheet" href="./styles.css?v=30">
+</head>
+<body>
+  <div class="bgVibe" aria-hidden="true"></div>
+  <div class="bgShade" aria-hidden="true"></div>
+
+  <div id="app">
+    <header>
+      <h1>Near</h1>
+      <div class="tagline">Profile</div>
+      <div id="statusLine" class="statusLine">Loading…</div>
+    </header>
+
+    <section class="pageCard">
+      <div class="rowBetween">
+        <div class="h2" id="pName">Profile</div>
+        <a class="miniLink" id="editLink" href="./create.html">Edit</a>
+      </div>
+
+      <div class="preview" id="heroWrap" style="margin-top:12px;">
+        <img id="heroImg" alt="" />
+      </div>
+
+      <div style="margin-top:12px;">
+        <div class="pSub" id="pBio" style="font-size:16px; line-height:1.35;"></div>
+        <div class="pDist" id="pLoc" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="btnRow" style="margin-top:16px;">
+        <a class="btn ghost" href="./index.html" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">Back</a>
+        <a class="btn primary" id="openCreate" href="./create.html" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">Update profile</a>
+      </div>
+
+      <div class="help" id="hint" style="margin-top:10px;"></div>
+    </section>
+  </div>
+
+  <script type="module" src="./profile.js?v=30"></script>
+</body>
+</html>
