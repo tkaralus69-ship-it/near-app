@@ -21,7 +21,12 @@ import {
   limit,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
+import {
+  getStorage,
+  ref as sRef,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 // ✅ Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyA2ApGkST41s9U53GQIatv4FL8aCPVzeAM",
