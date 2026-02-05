@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Near</title>
+
+  <style>
+    :root{
+      --bg1:#05070b;
+      --bg2:#0b1220;
+      --glass: rgba(10, 18, 32, .55);
+      --glass2: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius: 26px;
+      --btnRadius: 999px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 700px at 20% 15%, rgba(96,165,250,.18), transparent 55%),
+                  radial-gradient(900px 600px at 80% 25%, rgba(52,211,153,.14), transparent 55%),
+                  radial-gradient(1100px 800px at 40% 90%, rgba(251,191,36,.12), transparent 60%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    /* Full colour hero image behind glass */
+    .heroWrap{
+      position:relative;
+      min-height:100%;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding: 18px 14px 40px;
+    }
+
+    .heroBg{
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(2,6,23,.45), rgba(2,6,23,.78)),
+        url("./img/hero.jpg");
+      background-size: cover;
+      background-position: center;
+      filter: saturate(1.25) contrast(1.05);
+      transform: scale(1.04);
+    }
+
+    /* fallback if ./img/hero.jpg not present */
+    .heroBg.fallback{
+      background:
+        linear-gradient(180deg, rgba(2,6,23,.55), rgba(2,6,23,.85)),
+        url("https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1400&q=80");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .content{
+      position:relative;
+      width: min(520px, 100%);
+      margin-top: 14px;
+    }
+
+    .topRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 10px;
+    }
+
+    .brandMini{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 14px;
+      border-radius: var(--btnRadius);
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+    }
+    .brandDot{
+      width:10px;height:10px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #34d399, #60a5fa);
+      box-shadow: 0 0 18px rgba(96,165,250,.35);
+    }
+    .brandMini b{ letter-spacing:.22em; font-size:14px; }
+    .brandMini span{ color: var(--muted); font-size:12px; }
+
+    .pill{
+      padding: 10px 14px;
+      border-radius: var(--btnRadius);
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+      color: rgba(255,255,255,.85);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .heroCard{
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      overflow:hidden;
+    }
+
+    .heroHeader{
+      text-align:center;
+      padding: 28px 18px 14px;
+    }
+
+    .title{
+      font-size: 64px;
+      line-height: .95;
+      margin: 4px 0 8px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-shadow: 0 18px 60px rgba(0,0,0,.45);
+    }
+
+    .tagline{
+      color: rgba(255,255,255,.82);
+      font-size: 18px;
+      letter-spacing: .02em;
+    }
+
+    .chooseVibe{
+      margin: 14px 0 0;
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-shadow: 0 18px 60px rgba(0,0,0,.45);
+    }
+
+    .section{
+      padding: 18px;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .grid3{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+
+    .btn{
+      appearance:none;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.92);
+      border-radius: var(--btnRadius);
+      padding: 18px 18px;
+      font-weight: 750;
+      font-size: 20px;
+      letter-spacing: .01em;
+      cursor:pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+      transition: transform .08s ease, border-color .12s ease, background .12s ease;
+      text-align:center;
+      user-select:none;
+    }
+    .btn:active{ transform: scale(.99); }
+    .btn:hover{ border-color: rgba(255,255,255,.22); background: rgba(0,0,0,.26); }
+
+    .btn.smallBlock{
+      border-radius: 22px;
+      font-size: 16px;
+      padding: 18px 14px;
+      text-align:left;
+      font-weight: 750;
+      line-height: 1.1;
+      min-height: 86px;
+      display:flex;
+      align-items:flex-end;
+    }
+
+    .btn.primary{
+      background: linear-gradient(90deg, rgba(16,185,129,.28), rgba(96,165,250,.20));
+      border-color: rgba(255,255,255,.18);
+      font-size: 20px;
+    }
+
+    .btn.primary:hover{
+      background: linear-gradient(90deg, rgba(16,185,129,.34), rgba(96,165,250,.25));
+    }
+
+    .btn.selected{
+      background: linear-gradient(90deg, rgba(16,185,129,.34), rgba(251,191,36,.18));
+      border-color: rgba(255,255,255,.24);
+      box-shadow: 0 16px 42px rgba(0,0,0,.30);
+    }
+
+    .foot{
+      padding: 16px 18px 22px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.12);
+    }
+
+    .footRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .caption{
+      color: rgba(255,255,255,.75);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .linkRow{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .linkBtn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      text-decoration:none;
+      color: rgba(255,255,255,.92);
+      padding: 14px 18px;
+      border-radius: var(--btnRadius);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+      font-weight: 800;
+      white-space: nowrap;
+      transition: transform .08s ease, border-color .12s ease, background .12s ease;
+    }
+    .linkBtn:active{ transform: scale(.99); }
+    .linkBtn:hover{ border-color: rgba(255,255,255,.22); background: rgba(0,0,0,.26); }
+
+    .subtle{
+      font-size: 12px;
+      color: rgba(255,255,255,.62);
+      margin-top: 10px;
+    }
+
+    @media (max-width: 420px){
+      .title{ font-size: 56px; }
+      .chooseVibe{ font-size: 36px; }
+      .grid3{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- If you have your own image in /img/hero.jpg it will use that.
+       If not, it automatically falls back to a full-colour image. -->
+  <div class="heroWrap">
+    <div id="heroBg" class="heroBg"></div>
+
+    <main class="content">
+      <div class="topRow">
+        <div class="brandMini">
+          <div class="brandDot" aria-hidden="true"></div>
+          <div>
+            <b>NEAR</b><br />
+            <span>nearest &amp; dearest</span>
+          </div>
+        </div>
+
+        <div id="pill" class="pill">Up to date</div>
+      </div>
+
+      <section class="heroCard" aria-label="Near welcome">
+        <header class="heroHeader">
+          <div class="title">Near</div>
+          <div class="tagline">Real people. Near you.<br/>Live.</div>
+
+          <div class="chooseVibe">Choose your vibe</div>
+        </header>
+
+        <div class="section">
+          <div class="grid2" aria-label="Vibe buttons">
+            <button class="btn vibe" data-vibe="City">City</button>
+            <button class="btn vibe" data-vibe="Tech">Tech</button>
+            <button class="btn vibe" data-vibe="Nature">Nature</button>
+            <button class="btn vibe" data-vibe="Fitness">Fitness</button>
+            <button class="btn vibe" data-vibe="Beach">Beach</button>
+            <button class="btn vibe" data-vibe="Food">Food</button>
+          </div>
+
+          <div style="height:14px"></div>
+
+          <div class="grid3" aria-label="Actions">
+            <button class="btn smallBlock" id="btnChooseNear">Choose<br/>someone<br/>Near</button>
+            <button class="btn smallBlock" id="btnWave">Send a<br/>Wave</button>
+            <button class="btn smallBlock" id="btnLiveWaves">See Live<br/>waves</button>
+          </div>
+        </div>
+
+        <footer class="foot">
+          <div class="footRow">
+            <div>
+              <div class="caption" style="letter-spacing:.18em; opacity:.9;">PEOPLE NEAR</div>
+              <div class="subtle">Nothing personal loads until you choose to enter.</div>
+            </div>
+
+            <!-- IMPORTANT:
+                 This is where we send people into your LIVE app.
+                 If your live app is on a different page, change this href.
+
+                 Options you currently have in your repo:
+                 - profile.html  (looks like your full profile/live area)
+                 - create.html   (create/edit flow)
+                 - create.html can be linked too, but I recommend profile.html as “Live”
+            -->
+            <a class="linkBtn" id="enterNear" href="profile.html">Enter Near (Live)</a>
+          </div>
+        </footer>
+      </section>
+
+      <div class="subtle" style="text-align:center; margin-top:12px;">
+        Tip: Put your own hero image at <b>/img/hero.jpg</b> for the exact “full colour screen” you want.
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // If /img/hero.jpg doesn't exist, switch to the fallback full-colour image.
+    (function(){
+      const bg = document.getElementById("heroBg");
+      const test = new Image();
+      test.onload = () => { /* hero.jpg exists, keep default */ };
+      test.onerror = () => bg.classList.add("fallback");
+      test.src = "./img/hero.jpg";
+    })();
+
+    const pill = document.getElementById("pill");
+    let selectedVibe = null;
+
+    function setPill(text){
+      pill.textContent = text;
+    }
+
+    document.querySelectorAll(".btn.vibe").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".btn.vibe").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedVibe = btn.dataset.vibe || null;
+        setPill(selectedVibe ? ("Vibe: " + selectedVibe) : "Up to date");
+
+        // Pass vibe into the live page (optional)
+        // Your live page can read it from URL: new URLSearchParams(location.search).get("vibe")
+        const enter = document.getElementById("enterNear");
+        const url = new URL(enter.getAttribute("href"), location.href);
+        if (selectedVibe) url.searchParams.set("vibe", selectedVibe);
+        else url.searchParams.delete("vibe");
+        enter.setAttribute("href", url.pathname.replace(location.pathname, "") + url.search);
+      });
+    });
+
+    // Placeholder buttons (keep the vibe, but no live features yet)
+    document.getElementById("btnChooseNear").addEventListener("click", () => {
+      alert("Soon: pick someone nearby and open their profile.");
+    });
+    document.getElementById("btnWave").addEventListener("click", () => {
+      alert("Soon: send a wave 👋");
+    });
+    document.getElementById("btnLiveWaves").addEventListener("click", () => {
+      alert("Soon: live waves feed 🌊");
+    });
+  </script>
+</body>
+</html>
