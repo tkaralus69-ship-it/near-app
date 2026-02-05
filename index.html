@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near — Real people. Near you.</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0f14" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      color: #ffffff;
+      background:
+        linear-gradient(
+          rgba(0,0,0,0.55),
+          rgba(0,0,0,0.75)
+        ),
+        url("./img/hero.jpg") center / cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 420px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+      background: rgba(12,16,22,0.55);
+      border-radius: 28px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .brand h1 {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .brand p {
+      opacity: 0.85;
+      margin-top: 6px;
+      font-size: 15px;
+    }
+
+    h2 {
+      margin: 26px 0 16px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 600;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(6px);
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255,255,255,0.22);
+      transform: translateY(-1px);
+    }
+
+    .btn.full {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #00d09c, #00b3ff);
+      color: #001411;
+    }
+
+    .btn.primary:hover {
+      opacity: 0.95;
+    }
+
+    .footer {
+      margin-top: 22px;
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.75;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <div class="brand">
+      <h1>Near</h1>
+      <p>Real people. Near you. Live.</p>
+    </div>
+
+    <h2>Choose your vibe</h2>
+
+    <div class="grid">
+      <button class="btn">City</button>
+      <button class="btn">Tech</button>
+      <button class="btn">Nature</button>
+      <button class="btn">Fitness</button>
+      <button class="btn">Beach</button>
+      <button class="btn">Food</button>
+    </div>
+
+    <!-- Navigation -->
+    <button class="btn full" onclick="goLive()">Choose someone Near</button>
+    <button class="btn full" onclick="goLive()">Send a Wave</button>
+    <button class="btn full" onclick="goLive()">See Live Waves</button>
+
+    <button class="btn full primary" onclick="goLive()">
+      Enter Near (Live)
+    </button>
+
+    <div class="footer">
+      Distances shown as a minimum of 1 km for privacy.
+    </div>
+  </main>
+
+  <script>
+    function goLive() {
+      // IMPORTANT: relative path for GitHub Pages project sites
+      window.location.href = "./create.html";
+    }
+  </script>
+</body>
+</html>
