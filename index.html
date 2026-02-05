@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near — Real people. Near you.</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="hero" id="hero">
+    <div class="top">
+      <div class="brand">
+        <b>NEAR</b>
+        <span>nearest &amp; dearest</span>
+      </div>
+      <div class="badge" id="statusBadge">Up to date</div>
+    </div>
+
+    <div class="wrap">
+      <div class="title">
+        <h1>Near</h1>
+        <p>Real people. Near you. Live.</p>
+      </div>
+
+      <div class="headline">Choose your vibe</div>
+
+      <div class="grid" id="vibeGrid">
+        <button class="vibe" data-vibe="city"   data-img="city.jpg">City</button>
+        <button class="vibe" data-vibe="tech"   data-img="tech.jpg">Tech</button>
+        <button class="vibe" data-vibe="nature" data-img="nature.jpg">Nature</button>
+        <button class="vibe" data-vibe="fitness" data-img="fitness.jpg">Fitness</button>
+        <button class="vibe" data-vibe="beach"  data-img="beach.jpg">Beach</button>
+        <button class="vibe" data-vibe="food"   data-img="food.jpg">Food</button>
+      </div>
+
+      <div class="row3">
+        <button class="mini" id="btnChooseNear">Choose<br/>someone<br/>Near</button>
+        <button class="mini" id="btnWave">Send a<br/>Wave</button>
+        <button class="mini" id="btnLiveWaves">See Live<br/>waves</button>
+      </div>
+
+      <!-- Micro line -->
+      <div class="micro" id="microLine">Location is only used when you ask for it.</div>
+
+      <div class="panel">
+        <div class="panelHead">
+          <h3>People Near</h3>
+          <div class="actions">
+            <button class="pillBtn" id="btnCreate">Create</button>
+            <button class="pillBtn" id="btnMe">Me</button>
+          </div>
+        </div>
+
+        <div class="panelSub">
+          Distances shown as a minimum of <b>5 km</b> for privacy.
+        </div>
+
+        <!-- Optional preview card (kept off by default) -->
+        <div class="card" id="previewCard" style="display:none;">
+          <img class="avatar" id="previewAvatar" alt="" />
+          <div class="meta">
+            <p class="name" id="previewName"></p>
+            <p class="bio" id="previewBio"></p>
+            <div class="town" id="previewTown"></div>
+          </div>
+          <div class="right" id="previewDist"></div>
+        </div>
+      </div>
+
+      <div class="foot"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
