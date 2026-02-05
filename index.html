@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near — Real people. Near you.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        linear-gradient(
+          rgba(0,0,0,0.45),
+          rgba(0,0,0,0.65)
+        ),
+        url("img/hero.jpg") center / cover no-repeat;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: 92%;
+      max-width: 420px;
+      background: rgba(20, 25, 30, 0.65);
+      backdrop-filter: blur(14px);
+      border-radius: 28px;
+      padding: 32px 26px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    }
+
+    .brand {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .tagline {
+      font-size: 16px;
+      opacity: 0.85;
+      margin-bottom: 28px;
+    }
+
+    .headline {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .vibes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .vibe {
+      padding: 14px 0;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      font-weight: 600;
+      font-size: 15px;
+      opacity: 0.9;
+    }
+
+    .enter {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 18px 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #00e5b0, #00b6ff);
+      color: #0b1b18;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(0,230,180,0.35);
+    }
+
+    .privacy {
+      margin-top: 18px;
+      font-size: 13px;
+      opacity: 0.65;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="brand">Near</div>
+    <div class="tagline">Real people. Near you. Live.</div>
+
+    <div class="headline">Choose your vibe</div>
+
+    <div class="vibes">
+      <div class="vibe">City</div>
+      <div class="vibe">Tech</div>
+      <div class="vibe">Nature</div>
+      <div class="vibe">Fitness</div>
+      <div class="vibe">Beach</div>
+      <div class="vibe">Food</div>
+    </div>
+
+    <!-- SINGLE REAL ACTION -->
+    <a class="enter" href="profile.html">
+      Enter Near (Live)
+    </a>
+
+    <div class="privacy">
+      Distances shown as a minimum of 1 km for privacy.
+    </div>
+  </div>
+</body>
+</html>
