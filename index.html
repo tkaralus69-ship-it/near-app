@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near — Real people. Near you.</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+
+  <style>
+    :root{
+      --glass: rgba(10, 14, 20, .42);
+      --glass2: rgba(10, 14, 20, .30);
+      --stroke: rgba(255,255,255,.18);
+      --txt: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --radius: 26px;
+      --pill: 999px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      color: var(--txt);
+      background: #05070d;
+      overflow-x:hidden;
+    }
+
+    /* FULL BLEED HERO BACKGROUND */
+    .hero{
+      min-height: 100vh;
+      position: relative;
+      background:
+        radial-gradient(1200px 800px at 50% 18%, rgba(255,255,255,.10), transparent 55%),
+        linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.72) 100%),
+        url("img/hero.jpg") center/cover no-repeat;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute; inset:0;
+      backdrop-filter: blur(0px);
+      pointer-events:none;
+    }
+
+    .top{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 14px 16px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      padding: 10px 14px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(12px);
+    }
+    .brand b{
+      letter-spacing:.28em;
+      font-size: 14px;
+    }
+    .brand span{
+      font-size: 13px;
+      opacity:.8;
+    }
+
+    .badge{
+      align-self:flex-start;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(12px);
+      font-size: 14px;
+      opacity: .95;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      white-space: nowrap;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: rgba(255,255,255,.55);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.10);
+      flex: 0 0 auto;
+    }
+    .dot.on{
+      background: rgba(70, 255, 180, .95);
+      box-shadow: 0 0 0 3px rgba(70,255,180,.14);
+    }
+
+    .wrap{
+      width: min(520px, 92vw);
+      margin: 0 auto;
+      padding: 26px 0 28px;
+    }
+
+    .title{
+      text-align:center;
+      padding: 18px 18px 10px;
+    }
+    .title h1{
+      margin: 6px 0 0;
+      font-size: 64px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: .01em;
+      text-shadow: 0 10px 40px rgba(0,0,0,.55);
+    }
+    .title p{
+      margin: 8px 0 0;
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .headline{
+      margin: 18px 0 12px;
+      font-size: 44px;
+      font-weight: 800;
+      line-height: 1.03;
+      text-shadow: 0 12px 40px rgba(0,0,0,.55);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .vibe{
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(12px);
+      border-radius: var(--pill);
+      padding: 18px 18px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--txt);
+      cursor:pointer;
+      transition: transform .15s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+
+    .vibe:active{ transform: scale(.99); }
+
+    .vibe.active{
+      border-color: rgba(255,255,255,.32);
+      background: rgba(255,255,255,.18);
+      box-shadow: 0 16px 50px rgba(0,0,0,.40);
+    }
+
+    .row3{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    .mini{
+      border-radius: 22px;
+      padding: 16px 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(12px);
+      color: var(--txt);
+      font-weight: 750;
+      font-size: 18px;
+      text-align:left;
+      cursor:pointer;
+      min-height: 86px;
+      display:flex;
+      align-items:flex-end;
+      box-shadow: 0 12px 40px rgba(0,0,0,.28);
+    }
+
+    .panel{
+      margin-top: 18px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .panelHead{
+      padding: 18px 18px 8px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+
+    .panelHead h3{
+      margin:0;
+      font-size: 44px;
+      letter-spacing:.02em;
+    }
+
+    .panelHead .actions{
+      display:flex;
+      gap: 10px;
+    }
+
+    .pillBtn{
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.10);
+      color: rgba(255,255,255,.92);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor:pointer;
+      backdrop-filter: blur(12px);
+    }
+
+    .panelSub{
+      padding: 0 18px 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .card{
+      margin: 0 18px 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.10);
+      backdrop-filter: blur(16px);
+      padding: 14px;
+      display:flex;
+      gap: 12px;
+      align-items:center;
+    }
+
+    .avatar{
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.25);
+      flex: 0 0 auto;
+    }
+
+    .card .meta{
+      flex:1;
+      min-width:0;
+    }
+
+    .name{
+      font-weight: 850;
+      margin:0;
+      font-size: 18px;
+    }
+
+    .bio{
+      margin:6px 0 0;
+      color: rgba(255,255,255,.80);
+      font-size: 14px;
+      line-height: 1.25;
+      display:-webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow:hidden;
+    }
+
+    .town{
+      margin-top: 8px;
+      font-size: 12px;
+      letter-spacing:.18em;
+      opacity:.85;
+    }
+
+    .right{
+      font-weight: 750;
+      opacity:.9;
+      white-space: nowrap;
+      padding-left: 8px;
+    }
+
+    .foot{
+      text-align:center;
+      padding: 18px 0 28px;
+      color: rgba(255,255,255,.66);
+      font-size: 14px;
+    }
+
+    @media (max-width: 420px){
+      .title h1{ font-size: 58px; }
+      .headline{ font-size: 40px; }
+      .panelHead h3{ font-size: 38px; }
+      .mini{ min-height: 78px; font-size: 16px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="hero" id="hero">
+    <div class="top">
+      <div class="brand">
+        <b>NEAR</b>
+        <span>nearest &amp; dearest</span>
+      </div>
+
+      <div class="badge" id="statusBadge" title="Location status">
+        <span class="dot" id="locDot"></span>
+        <span id="statusText">Up to date</span>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="title">
+        <h1>Near</h1>
+        <p>Real people. Near you. Live.</p>
+      </div>
+
+      <div class="headline">Choose your vibe</div>
+
+      <div class="grid" id="vibeGrid">
+        <button class="vibe" data-vibe="city"   data-img="city.jpg">City</button>
+        <button class="vibe" data-vibe="tech"   data-img="tech.jpg">Tech</button>
+        <button class="vibe" data-vibe="nature" data-img="nature.jpg">Nature</button>
+        <button class="vibe" data-vibe="fitness" data-img="fitness.jpg">Fitness</button>
+        <button class="vibe" data-vibe="beach"  data-img="beach.jpg">Beach</button>
+        <button class="vibe" data-vibe="food"   data-img="food.jpg">Food</button>
+      </div>
+
+      <div class="row3">
+        <button class="mini" id="btnChooseNear">Choose<br/>someone<br/>Near</button>
+        <button class="mini" id="btnWave">Send a<br/>Wave</button>
+        <button class="mini" id="btnLiveWaves">See Live<br/>waves</button>
+      </div>
+
+      <div class="panel">
+        <div class="panelHead">
+          <h3>People Near</h3>
+          <div class="actions">
+            <button class="pillBtn" id="btnCreate">Create</button>
+            <button class="pillBtn" id="btnMe">Me</button>
+          </div>
+        </div>
+
+        <div class="panelSub" id="privacyLine">
+          Distances shown as a minimum of 5 km for privacy.
+        </div>
+
+        <div class="card" id="previewCard" style="display:none;">
+          <img class="avatar" id="previewAvatar" alt="" />
+          <div class="meta">
+            <p class="name" id="previewName"></p>
+            <p class="bio" id="previewBio"></p>
+            <div class="town" id="previewTown"></div>
+          </div>
+          <div class="right" id="previewDist"></div>
+        </div>
+      </div>
+
+      <div class="foot"></div>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // Privacy / location rules
+    // =========================
+    const PRIVACY_MIN_KM = 5; // changed from 1km to 5km
+    const LS_LAT = "near_lat";
+    const LS_LNG = "near_lng";
+
+    const hero = document.getElementById("hero");
+    const vibeGrid = document.getElementById("vibeGrid");
+    const statusText = document.getElementById("statusText");
+    const locDot = document.getElementById("locDot");
+
+    const vibeButtons = Array.from(vibeGrid.querySelectorAll(".vibe"));
+
+    function hasSavedLocation(){
+      const lat = localStorage.getItem(LS_LAT);
+      const lng = localStorage.getItem(LS_LNG);
+      return !!(lat && lng);
+    }
+
+    function setStatus(text){
+      statusText.textContent = text;
+    }
+
+    function setLocIndicator(on){
+      if (on) locDot.classList.add("on");
+      else locDot.classList.remove("on");
+    }
+
+    function refreshTopStatus(){
+      // Don’t prompt on landing. Just reflect state.
+      const vibe = localStorage.getItem("near_vibe");
+      const locOn = hasSavedLocation();
+
+      if (vibe && locOn) setStatus(`Vibe: ${vibe} • Location on`);
+      else if (vibe && !locOn) setStatus(`Vibe: ${vibe} • Location off`);
+      else if (!vibe && locOn) setStatus(`Location on`);
+      else setStatus("Location off");
+
+      setLocIndicator(locOn);
+    }
+
+    function setHeroImage(filename){
+      hero.style.background =
+        `radial-gradient(1200px 800px at 50% 18%, rgba(255,255,255,.10), transparent 55%),
+         linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.72) 100%),
+         url("img/${filename}") center/cover no-repeat`;
+    }
+
+    // default warm hero
+    setHeroImage("hero.jpg");
+
+    function setActive(btn){
+      vibeButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    }
+
+    function setVibe(vibe){
+      localStorage.setItem("near_vibe", vibe);
+      refreshTopStatus();
+    }
+
+    vibeButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        setActive(btn);
+        setHeroImage(btn.dataset.img);
+        setVibe(btn.dataset.vibe);
+      });
+    });
+
+    // Restore last vibe
+    const savedVibe = localStorage.getItem("near_vibe");
+    if (savedVibe){
+      const btn = vibeButtons.find(b => b.dataset.vibe === savedVibe);
+      if (btn){
+        setActive(btn);
+        setHeroImage(btn.dataset.img);
+      }
+    }
+
+    // =========================
+    // Location: ask ONLY when user chooses a feature that needs it
+    // =========================
+    function requestLocationOnce(){
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation){
+          reject(new Error("Geolocation not supported"));
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const { latitude, longitude } = pos.coords;
+            try{
+              localStorage.setItem(LS_LAT, String(latitude));
+              localStorage.setItem(LS_LNG, String(longitude));
+            }catch(e){}
+            refreshTopStatus();
+            resolve({ latitude, longitude });
+          },
+          (err) => {
+            refreshTopStatus();
+            reject(err);
+          },
+          { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+        );
+      });
+    }
+
+    async function ensureLocationThen(run){
+      // If already saved, don't re-prompt.
+      if (hasSavedLocation()){
+        run();
+        return;
+      }
+
+      try{
+        await requestLocationOnce(); // this is what triggers the browser prompt
+        run();
+      }catch(e){
+        alert("To use this feature, please enable location.");
+      }
+    }
+
+    // =========================
+    // Navigation: only when user chooses
+    // =========================
+    document.getElementById("btnCreate").addEventListener("click", () => {
+      window.location.href = "create.html";
+    });
+
+    document.getElementById("btnMe").addEventListener("click", () => {
+      window.location.href = "profile.html";
+    });
+
+    // These two should ask for location (because “near” + “live” needs it)
+    document.getElementById("btnChooseNear").addEventListener("click", () => {
+      ensureLocationThen(() => {
+        // later: open list of nearby people / cards
+        alert("Location enabled ✅\nSoon: pick someone nearby and open their profile.");
+      });
+    });
+
+    document.getElementById("btnLiveWaves").addEventListener("click", () => {
+      ensureLocationThen(() => {
+        // later: live waves page/feed
+        alert("Location enabled ✅\nSoon: live waves feed 🌊");
+        // Example later:
+        // window.location.href = "plans.html";
+      });
+    });
+
+    // Wave doesn't need location (keep it playful)
+    document.getElementById("btnWave").addEventListener("click", () => {
+      alert("Soon: send a wave 👋");
+    });
+
+    // initial status indicator (no prompt)
+    refreshTopStatus();
+  </script>
+</body>
+</html>
