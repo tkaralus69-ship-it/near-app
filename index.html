@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Near</title>
+
+<style>
+:root {
+  --glass: rgba(15,23,42,0.55);
+  --blur: blur(14px);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,.75)),
+    url("assets/hero.jpg") center / cover no-repeat;
+  color: #fff;
+}
+
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+}
+
+header {
+  text-align: center;
+  margin-top: 12vh;
+}
+
+header h1 {
+  font-size: clamp(40px, 10vw, 64px);
+  letter-spacing: .5px;
+  margin: 0;
+}
+
+header p {
+  margin-top: 10px;
+  opacity: .85;
+  font-size: 16px;
+}
+
+.panel {
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.4);
+}
+
+.panel h2 {
+  margin: 0 0 14px;
+  font-size: 26px;
+}
+
+.vibes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.vibe {
+  padding: 16px;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 600;
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.18);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.action {
+  padding: 14px;
+  border-radius: 18px;
+  text-align: center;
+  font-weight: 600;
+  background: rgba(0,0,0,.45);
+}
+
+footer {
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
+.enter {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg,#10b981,#059669);
+  text-align: center;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Near</h1>
+    <p>Real people. Near you.<br/>Live.</p>
+  </header>
+
+  <div class="panel">
+    <h2>Choose your vibe</h2>
+
+    <div class="vibes">
+      <div class="vibe">City</div>
+      <div class="vibe">Tech</div>
+      <div class="vibe">Nature</div>
+      <div class="vibe">Fitness</div>
+      <div class="vibe">Beach</div>
+      <div class="vibe">Food</div>
+    </div>
+
+    <div class="actions">
+      <div class="action">Choose someone Near</div>
+      <div class="action">Send a Wave</div>
+      <div class="action">See Live Waves</div>
+    </div>
+
+    <div class="enter" onclick="enterNear()">
+      Enter Near
+    </div>
+  </div>
+
+  <footer></footer>
+
+</div>
+
+<script>
+function enterNear() {
+  window.location.href = "app.html";
+}
+</script>
+</body>
+</html>
