@@ -1,3 +1,77 @@
+<!-- force rebuild -->
+<script type="module">
+  import { auth } from "./firebase.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  window.addEventListener("DOMContentLoaded", () => {
+
+    // --- Vibe behaviour: PLAY FIRST, NO FORCED NAV ---
+    const hero = document.getElementById("hero");
+    const vibeGrid = document.getElementById("vibeGrid");
+    const statusBadge = document.getElementById("statusBadge");
+
+    if (!hero || !vibeGrid || !statusBadge) {
+      console.warn("Near: core elements missing");
+      return;
+    }
+
+    const vibeButtons = Array.from(vibeGrid.querySelectorAll(".vibe"));
+
+    function setHeroImage(filename){
+      hero.style.background =
+        `radial-gradient(1200px 800px at 50% 18%, rgba(255,255,255,.10), transparent 55%),
+         linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.72) 100%),
+         url("img/${filename}") center/cover no-repeat`;
+    }
+
+    function setActive(btn){
+      vibeButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    }
+
+    function setVibe(vibe){
+      localStorage.setItem("near_vibe", vibe);
+      statusBadge.textContent = `Vibe: ${vibe}`;
+    }
+
+    vibeButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        setActive(btn);
+        setHeroImage(btn.dataset.img);
+        setVibe(btn.dataset.vibe);
+      });
+    });
+
+    // Restore last vibe
+    const saved = localStorage.getItem("near_vibe");
+    if (saved){
+      const btn = vibeButtons.find(b => b.dataset.vibe === saved);
+      if (btn){
+        setActive(btn);
+        setHeroImage(btn.dataset.img);
+        statusBadge.textContent = `Vibe: ${saved}`;
+      }
+    } else {
+      setHeroImage("hero.jpg");
+    }
+
+    // --- Auth gating ---
+    let currentUser = null;
+    onAuthStateChanged(auth, (u) => currentUser = u);
+
+    function goOrLogin(target){
+      if (currentUser) window.location.href = target;
+      else window.location.href = `login.html?next=${encodeURIComponent(target)}`;
+    }
+
+    document.getElementById("btnCreate")?.addEventListener("click", () => goOrLogin("create.html"));
+    document.getElementById("btnMe")?.addEventListener("click", () => goOrLogin("profile.html"));
+    document.getElementById("btnChooseNear")?.addEventListener("click", () => goOrLogin("near.html"));
+    document.getElementById("btnWave")?.addEventListener("click", () => alert("Soon: send a wave 👋"));
+    document.getElementById("btnLiveWaves")?.addEventListener("click", () => alert("Soon: live waves 🌊"));
+
+  });
+</script>
 <!-- Firebase SDKs -->
 <script type="module">
   // Firebase core
