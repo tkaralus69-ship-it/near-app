@@ -1,0 +1,296 @@
+:root{
+  --glass: rgba(10, 14, 20, .42);
+  --glass2: rgba(10, 14, 20, .28);
+  --stroke: rgba(255,255,255,.18);
+  --txt: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.70);
+  --shadow: 0 18px 60px rgba(0,0,0,.55);
+  --radius: 28px;
+  --pill: 999px;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  color: var(--txt);
+  background:#05070d;
+  overflow-x:hidden;
+}
+
+/* HERO */
+.hero{
+  min-height: 100svh;
+  position: relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding: clamp(14px, 3.5vw, 26px);
+  background:
+    radial-gradient(1200px 800px at 50% 18%, rgba(255,255,255,.10), transparent 55%),
+    linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.45) 55%, rgba(0,0,0,.60) 100%),
+    url("img/hero.jpg") center/cover no-repeat;
+}
+
+/* A soft global tint so images still pop but don't crush */
+.hero::after{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 500px at 50% 20%, rgba(255,255,255,.06), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.30));
+}
+
+/* Top pills */
+.heroTop{
+  width:100%;
+  position: relative;
+  z-index: 2;
+  display:flex;
+  justify-content:space-between;
+  gap: 12px;
+  align-items:flex-start;
+  padding: 4px 2px 0;
+}
+
+.brandPill{
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(12px);
+}
+
+.brandName{
+  letter-spacing:.28em;
+  font-size: 14px;
+  font-weight: 800;
+}
+.brandTag{
+  margin-top: 2px;
+  font-size: 13px;
+  opacity:.78;
+}
+
+.statusPill{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--pill);
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(12px);
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: .95;
+}
+
+.dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #48f6c2;
+  box-shadow: 0 0 0 4px rgba(72,246,194,.14);
+  opacity:.25; /* becomes 1 when location on */
+}
+
+/* Center title */
+.heroCenter{
+  position: relative;
+  z-index: 2;
+  width: min(900px, 96vw);
+  text-align:center;
+  padding: clamp(14px, 3vw, 22px) 12px 10px;
+}
+
+.heroTitle{
+  margin: 8px 0 0;
+  font-size: clamp(54px, 9vw, 86px);
+  line-height: 1;
+  font-weight: 900;
+  text-shadow: 0 14px 60px rgba(0,0,0,.55);
+}
+
+.heroSub{
+  margin: 10px 0 0;
+  font-size: clamp(15px, 2.2vw, 20px);
+  color: var(--muted);
+  text-shadow: 0 10px 40px rgba(0,0,0,.45);
+}
+
+/* Main panel */
+.panel{
+  position: relative;
+  z-index: 2;
+  width: min(980px, 96vw);   /* 👈 wider on desktop */
+  margin: 10px auto 0;
+  padding: clamp(18px, 3vw, 26px);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(10, 14, 20, .34); /* 👈 less dark overall */
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+}
+
+.panelTitle{
+  margin: 0 0 14px;
+  font-size: clamp(38px, 6.2vw, 58px); /* 👈 bigger esp mobile */
+  font-weight: 900;
+  letter-spacing: .01em;
+  text-shadow: 0 14px 60px rgba(0,0,0,.55);
+}
+
+/* Vibes grid */
+.vibeGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(10px, 2.2vw, 16px);
+}
+
+.vibe{
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(0,0,0,.18);
+  backdrop-filter: blur(12px);
+  border-radius: var(--pill);
+  padding: clamp(16px, 2.8vw, 20px);
+  font-size: clamp(18px, 2.6vw, 22px);
+  font-weight: 850;
+  color: var(--txt);
+  cursor:pointer;
+  transition: transform .12s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+  box-shadow: 0 10px 30px rgba(0,0,0,.22);
+}
+.vibe:active{ transform: scale(.99); }
+.vibe.active{
+  border-color: rgba(255,255,255,.34);
+  background: rgba(255,255,255,.18);
+  box-shadow: 0 18px 60px rgba(0,0,0,.40);
+}
+
+/* Action grid */
+.actionGrid{
+  margin-top: clamp(12px, 2.4vw, 18px);
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: clamp(10px, 2.2vw, 14px);
+}
+
+.action{
+  border-radius: 24px;
+  padding: clamp(14px, 2.6vw, 18px);
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.18);
+  backdrop-filter: blur(12px);
+  color: var(--txt);
+  font-weight: 850;
+  font-size: clamp(16px, 2.2vw, 18px);
+  text-align:left;
+  cursor:pointer;
+  min-height: clamp(92px, 14vw, 96px);
+  display:flex;
+  align-items:flex-end;
+  box-shadow: 0 12px 40px rgba(0,0,0,.22);
+}
+
+/* Micro line */
+.microLine{
+  margin-top: 12px;
+  text-align:center;
+  color: rgba(255,255,255,.72);
+  font-size: 14px;
+  text-shadow: 0 10px 30px rgba(0,0,0,.40);
+}
+
+/* People Near card */
+.peopleCard{
+  margin-top: clamp(14px, 2.8vw, 18px);
+  padding: clamp(16px, 2.8vw, 20px);
+  border-radius: 26px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.18);
+  backdrop-filter: blur(12px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 14px;
+}
+
+.peopleTitle{
+  font-size: clamp(40px, 6vw, 56px);
+  font-weight: 900;
+  line-height: .92;
+}
+
+.peopleBtns{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+}
+
+.pillBtn{
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.10);
+  color: rgba(255,255,255,.92);
+  border-radius: var(--pill);
+  padding: 10px 16px;
+  font-weight: 850;
+  cursor:pointer;
+  backdrop-filter: blur(12px);
+  min-width: 78px;
+}
+
+.peopleNote{
+  flex-basis: 100%;
+  margin-top: 10px;
+  color: rgba(255,255,255,.70);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* Make note wrap under on tight widths */
+.peopleCard{
+  flex-wrap: wrap;
+}
+.peopleNote{
+  margin-top: 8px;
+}
+
+/* Bottom safe area */
+.safeBottom{
+  height: env(safe-area-inset-bottom, 0px);
+}
+
+/* ---------- MOBILE BRIGHTNESS FIX ---------- */
+/* On smaller screens, lighten the glass + reduce darkness */
+@media (max-width: 520px){
+  .hero{
+    background:
+      radial-gradient(1200px 800px at 50% 18%, rgba(255,255,255,.12), transparent 55%),
+      linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,.34) 55%, rgba(0,0,0,.48) 100%),
+      url("img/hero.jpg") center/cover no-repeat;
+  }
+
+  .panel{
+    background: rgba(14, 18, 26, .22);   /* 👈 brighter */
+    backdrop-filter: blur(14px);
+  }
+
+  .vibe, .action, .peopleCard{
+    background: rgba(0,0,0,.14);        /* 👈 less dark cards */
+  }
+
+  .brandPill{ background: rgba(0,0,0,.20); }
+  .statusPill{ background: rgba(255,255,255,.12); }
+
+  .peopleBtns{ margin-left:auto; }
+}
+
+/* ---------- DESKTOP SCALE UP ---------- */
+@media (min-width: 900px){
+  .panel{ width: min(1100px, 92vw); }
+  .vibeGrid{ gap: 18px; }
+  .actionGrid{ gap: 16px; }
+}
