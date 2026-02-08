@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near — Login</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page">
+  <div class="glassPage">
+    <div class="topRow">
+      <a class="pillBtn" href="index.html">← Back</a>
+      <div class="pillBadge" id="statusBadge">Email login</div>
+    </div>
+
+    <div class="panelBig">
+      <h1 class="bigTitle">Sign in</h1>
+      <p class="muted">
+        We’ll send you a single sign-in link. No pressure. No spam.
+      </p>
+
+      <label class="label">Email</label>
+      <input class="input" id="email" type="email" placeholder="you@example.com" autocomplete="email" />
+
+      <button class="cta" id="sendLinkBtn">Send sign-in link</button>
+
+      <p class="micro" id="microLine">
+        We only use your email to sign you in. After you’re verified, you can optionally opt in to updates.
+      </p>
+
+      <div class="divider"></div>
+
+      <button class="ghost" id="signOutBtn" style="display:none;">Sign out</button>
+    </div>
+  </div>
+
+  <script type="module" src="login.js"></script>
+</body>
+</html>
