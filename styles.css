@@ -1,0 +1,336 @@
+/* =========================
+   NEAR — Warm Glass UI (FINAL)
+   FULL styles.css
+   Goals:
+   - Glass ~30% lighter
+   - Top glass MORE transparent than main panel
+   - No flash-to-dark (stable brightness)
+   ========================= */
+
+:root{
+  --text: rgba(255,255,255,.96);
+  --muted: rgba(255,255,255,.76);
+
+  /* ===== GLASS TINTS (LIGHTER) ===== */
+  /* Main panel glass */
+  --glassA: rgba(40, 30, 22, .22);
+  --glassB: rgba(40, 30, 22, .14);
+
+  /* Top pills glass (MORE transparent) */
+  --glassTop: rgba(40, 30, 22, .14);
+
+  --stroke: rgba(255,255,255,.18);
+  --strokeSoft: rgba(255,255,255,.22);
+
+  /* Buttons */
+  --btnA: rgba(18, 14, 10, .34);
+  --btnB: rgba(18, 14, 10, .22);
+
+  /* Warm highlight */
+  --selA: rgba(255, 220, 170, .22);
+  --selStroke: rgba(255, 220, 170, .32);
+
+  /* Shadows (lighter than before) */
+  --shadow: 0 20px 55px rgba(0,0,0,.35);
+  --inner: inset 0 1px 0 rgba(255,255,255,.14),
+           inset 0 -20px 45px rgba(0,0,0,.16);
+
+  --radius: 28px;
+  --radius2: 22px;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+
+body{
+  margin:0;
+  font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  color: var(--text);
+  background:#0b1220;
+  overflow-x:hidden;
+}
+
+/* =========================
+   HERO BACKGROUND (STABLE + BRIGHT)
+   ========================= */
+.hero{
+  min-height: 100svh;
+  min-height: 100vh;
+  padding-bottom: 24px;
+
+  background:
+    radial-gradient(1200px 800px at 50% 16%, rgba(255,255,255,.18), transparent 58%),
+    linear-gradient(180deg,
+      rgba(0,0,0,.08) 0%,
+      rgba(0,0,0,.12) 55%,
+      rgba(0,0,0,.18) 100%
+    ),
+    url("img/hero.jpg") center top / cover no-repeat;
+
+  filter: saturate(1.08) contrast(1.04);
+}
+
+/* Warm glow — LIGHT, not dark */
+.hero::before{
+  content:"";
+  position: fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(1100px 700px at 50% 10%, rgba(255,220,160,.18), transparent 60%),
+    linear-gradient(to bottom, rgba(0,0,0,.04), rgba(0,0,0,.10));
+}
+
+.hero > *{
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================
+   TOP BAR (MORE TRANSPARENT)
+   ========================= */
+.heroTop{
+  width: min(1100px, 92vw);
+  margin: 18px auto 0;
+  display:flex;
+  justify-content: space-between;
+  align-items:flex-start;
+  gap: 12px;
+}
+
+.brandPill,
+.statusPill{
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: var(--glassTop);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 18px;
+  padding: 12px 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.22);
+}
+
+.brandName{
+  letter-spacing: .36em;
+  font-weight: 750;
+  font-size: 13px;
+}
+.brandTag{
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.statusPill{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size: 14px;
+}
+
+.dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(60,255,190,.75);
+  box-shadow: 0 0 0 4px rgba(60,255,190,.16);
+}
+
+/* =========================
+   HERO CENTER
+   ========================= */
+.heroCenter{
+  width: min(980px, 92vw);
+  margin: 18px auto 14px;
+  text-align:center;
+}
+
+.heroTitle{
+  margin: 14px 0 4px;
+  font-size: clamp(44px, 6vw, 64px);
+  font-weight: 860;
+  text-shadow: 0 10px 34px rgba(0,0,0,.32);
+}
+
+.heroSub{
+  margin: 0;
+  font-size: clamp(16px, 2vw, 20px);
+  color: rgba(255,255,255,.78);
+  text-shadow: 0 8px 22px rgba(0,0,0,.26);
+}
+
+/* =========================
+   MAIN PANEL (LIGHTER GLASS)
+   ========================= */
+.panel{
+  width: min(980px, 92vw);
+  margin: 16px auto 28px;
+  padding: 22px;
+
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--glassA), var(--glassB));
+  border: 1px solid var(--stroke);
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow:hidden;
+}
+
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius: inherit;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 420px at 20% 10%, rgba(255,220,160,.18), transparent 62%),
+    radial-gradient(800px 420px at 85% 12%, rgba(255,255,255,.12), transparent 62%);
+}
+
+.panel::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius: inherit;
+  pointer-events:none;
+  box-shadow: var(--inner);
+}
+
+.panel > *{ position: relative; z-index:1; }
+
+.panelTitle{
+  font-size: clamp(38px, 4.2vw, 54px);
+  font-weight: 900;
+  margin: 2px 0 18px;
+  text-shadow: 0 8px 24px rgba(0,0,0,.30);
+}
+
+/* =========================
+   VIBE GRID
+   ========================= */
+.vibeGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 18px;
+}
+
+.vibe{
+  border: 1px solid rgba(255,255,255,.20);
+  background: linear-gradient(180deg, var(--btnA), var(--btnB));
+  border-radius: 999px;
+  padding: 18px;
+  font-size: 18px;
+  font-weight: 720;
+  color: var(--text);
+  cursor:pointer;
+  box-shadow: 0 8px 22px rgba(0,0,0,.20);
+  transition: transform .12s ease, border-color .12s ease;
+}
+
+.vibe:hover{
+  transform: translateY(-1px);
+  border-color: var(--strokeSoft);
+}
+
+.vibe.active{
+  background: linear-gradient(180deg, var(--selA), rgba(18,14,10,.18));
+  border-color: var(--selStroke);
+}
+
+/* =========================
+   ACTION GRID
+   ========================= */
+.actionGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.action{
+  border: 1px solid rgba(255,255,255,.18);
+  background: linear-gradient(180deg, rgba(0,0,0,.26), rgba(0,0,0,.14));
+  border-radius: 18px;
+  padding: 18px 16px;
+  text-align:left;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  cursor:pointer;
+  box-shadow: 0 10px 26px rgba(0,0,0,.20);
+}
+
+/* =========================
+   MICRO LINE
+   ========================= */
+.microLine{
+  margin: 14px 0 16px;
+  text-align:center;
+  font-size: 15px;
+  color: rgba(255,255,255,.66);
+}
+
+/* =========================
+   PEOPLE CARD
+   ========================= */
+.peopleCard{
+  margin-top: 12px;
+  border-radius: var(--radius2);
+  background: rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.16);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 14px 38px rgba(0,0,0,.26);
+
+  padding: 18px;
+  display:grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 12px 14px;
+}
+
+.peopleTitle{
+  font-size: 44px;
+  font-weight: 900;
+  line-height: .95;
+}
+
+.peopleBtns{
+  display:flex;
+  gap: 10px;
+}
+
+.pillBtn{
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(0,0,0,.16);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 850;
+}
+
+.peopleNote{
+  grid-column: 1 / -1;
+  font-size: 14px;
+  color: rgba(255,255,255,.68);
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+@media (max-width: 520px){
+  .panel{ padding: 18px; }
+  .vibe{ padding: 16px; font-size: 17px; }
+  .peopleTitle{ font-size: 40px; }
+}
+
+@media (min-width: 900px){
+  .panel{ width: min(1080px, 92vw); padding: 26px; }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce){
+  *{ transition:none !important; }
+}
