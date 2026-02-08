@@ -320,3 +320,40 @@ body{
     font-size: 14px;
   }
 }
+/* =========================
+   MOBILE PANEL FIX (FINAL)
+   ========================= */
+@media (max-width: 520px){
+
+  /* Stop the panel from being tall */
+  .panel{
+    height: auto !important;
+    min-height: unset !important;
+    max-height: unset !important;
+
+    margin-top: 18px;
+    padding: 0;
+
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  /* Make sure nothing inside forces height */
+  .panel > *{
+    position: relative;
+  }
+
+  /* Remove any accidental vertical stretch */
+  .hero{
+    align-items: flex-start;
+  }
+
+  /* People Near card should be content-sized only */
+  .peopleCard{
+    height: auto;
+    min-height: unset;
+    margin-bottom: 24px;
+  }
+}
