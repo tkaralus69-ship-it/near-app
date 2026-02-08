@@ -433,3 +433,101 @@ body{
 @media (prefers-reduced-motion: reduce){
   *{ transition: none !important; }
 }
+/* =========================
+   LIGHTEN GLASS + OVERLAYS
+   FINAL OVERRIDE
+   ========================= */
+
+/* 1. Soften global hero darkening */
+.hero::before{
+  background:
+    radial-gradient(
+      900px 520px at 50% 16%,
+      rgba(255,255,255,.18),
+      transparent 62%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.04) 0%,
+      rgba(0,0,0,.12) 70%,
+      rgba(0,0,0,.16) 100%
+    );
+}
+
+/* 2. Make main panel lighter & clearer */
+.panel{
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,.20),
+    rgba(255,255,255,.10)
+  );
+  border: 1px solid rgba(255,255,255,.22);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* Remove heavy inner darkness */
+.panel::before{
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,.08),
+    rgba(0,0,0,.12)
+  );
+}
+
+/* 3. Lighten vibe buttons */
+.vibe{
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.24);
+  color: rgba(255,255,255,.95);
+}
+
+.vibe.active{
+  background: rgba(255,255,255,.28);
+  border-color: rgba(255,255,255,.35);
+}
+
+/* 4. Lighten action cards */
+.action{
+  background: rgba(255,255,255,.10);
+  border-color: rgba(255,255,255,.20);
+}
+
+/* 5. People card less heavy */
+.peopleCard{
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.22);
+}
+
+/* 6. Pills clearer */
+.pillBtn{
+  background: rgba(255,255,255,.20);
+  border-color: rgba(255,255,255,.30);
+}
+
+/* 7. Mobile: EXTRA lift (phones stack darkness more) */
+@media (max-width: 600px){
+  .panel{
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,255,.26),
+      rgba(255,255,255,.14)
+    );
+  }
+
+  .panel::before{
+    background: linear-gradient(
+      180deg,
+      rgba(0,0,0,.06),
+      rgba(0,0,0,.10)
+    );
+  }
+
+  .vibe{
+    background: rgba(255,255,255,.16);
+  }
+
+  .action{
+    background: rgba(255,255,255,.14);
+  }
+}
