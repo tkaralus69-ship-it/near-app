@@ -357,3 +357,55 @@ body{
     margin-bottom: 24px;
   }
 }
+/* ================================
+   FINAL MOBILE LAYOUT CORRECTION
+   ================================ */
+@media (max-width: 520px){
+
+  /* Hero must NOT force full height */
+  .hero{
+    min-height: auto !important;
+    height: auto !important;
+    padding-bottom: 32px;
+    align-items: flex-start;
+  }
+
+  /* Kill ANY full-height glass container */
+  .panel{
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    background: rgba(0,0,0,.22);
+    backdrop-filter: blur(16px);
+    border-radius: 26px;
+
+    margin: 18px auto 0;
+  }
+
+  /* This is the key line that fixes the blur slab */
+  .panel::after,
+  .panel::before{
+    display: none !important;
+  }
+
+  /* Prevent children from stretching parent */
+  .panel,
+  .peopleCard{
+    display: block;
+    align-self: flex-start;
+  }
+
+  /* Ensure People Near does NOT push height */
+  .peopleCard{
+    margin-bottom: 0;
+    padding-bottom: 16px;
+  }
+
+  /* Safety: remove any forced viewport math */
+  body,
+  main{
+    height: auto !important;
+    min-height: auto !important;
+  }
+}
