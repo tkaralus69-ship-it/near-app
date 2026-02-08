@@ -326,3 +326,29 @@ body{
   color: rgba(255,255,255,.88);
 }
 .opt input{ margin-top: 2px; }
+/* === Layout safety === */
+.hero {
+  min-height: 100svh;
+  display: flex;
+  justify-content: center;
+  padding: clamp(16px, 4vw, 32px);
+}
+
+/* Main glass panel */
+.panel {
+  width: 100%;
+  max-width: 680px;   /* 👈 THIS is the magic */
+  margin: 0 auto;
+}
+
+/* People Near card spacing */
+.peopleCard {
+  margin-top: 20px;
+}
+
+/* Desktop + mobile feel the same */
+@media (min-width: 768px) {
+  .panel {
+    max-width: 720px;
+  }
+}
