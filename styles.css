@@ -1,0 +1,361 @@
+/* =========================
+   NEAR — Warm Glass UI
+   FULL styles.css (glass ~30% lighter)
+   ========================= */
+
+:root{
+  --text: rgba(255,255,255,.94);
+  --muted: rgba(255,255,255,.74);
+
+  /* ✅ 30% lighter warm glass (was .34/.22) */
+  --glassA: rgba(30, 22, 16, .24);
+  --glassB: rgba(30, 22, 16, .15);
+
+  --stroke: rgba(255,255,255,.18);
+  --stroke2: rgba(255,255,255,.24);
+
+  /* Buttons (slightly lighter too so they don’t feel heavy) */
+  --btnA: rgba(12, 10, 8, .34);
+  --btnB: rgba(12, 10, 8, .22);
+
+  /* Warm selection highlight */
+  --selA: rgba(255, 220, 170, .22);
+  --selStroke: rgba(255, 220, 170, .30);
+
+  /* Slightly softer shadows because glass is lighter */
+  --shadow: 0 18px 60px rgba(0,0,0,.38);
+  --inner: inset 0 1px 0 rgba(255,255,255,.12),
+           inset 0 -18px 42px rgba(0,0,0,.16);
+
+  --radius: 28px;
+  --radius2: 22px;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  color: var(--text);
+  overflow-x:hidden;
+  background:#0b1220;
+}
+
+/* =========================
+   HERO BACKGROUND (BRIGHT WARM)
+   ========================= */
+.hero{
+  min-height: 100svh;
+  min-height: 100vh;
+  padding-bottom: 24px;
+
+  /* fallback if JS hasn’t run yet */
+  background:
+    radial-gradient(1200px 800px at 50% 18%, rgba(255,255,255,.14), transparent 58%),
+    linear-gradient(180deg, rgba(0,0,0,.12) 0%, rgba(0,0,0,.18) 55%, rgba(0,0,0,.24) 100%),
+    url("img/hero.jpg") center top/cover no-repeat;
+
+  filter: saturate(1.06) contrast(1.04);
+}
+
+/* Warm glow + gentle vignette (kept light) */
+.hero::before{
+  content:"";
+  position: fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(1100px 700px at 50% 10%, rgba(255,220,160,.16), transparent 58%),
+    radial-gradient(900px 650px at 50% 82%, rgba(0,0,0,.18), transparent 65%),
+    linear-gradient(to bottom, rgba(0,0,0,.05), rgba(0,0,0,.12));
+}
+.hero > *{ position: relative; z-index: 1; }
+
+/* =========================
+   TOP BADGES
+   ========================= */
+.heroTop{
+  width: min(1100px, 92vw);
+  margin: 18px auto 0;
+  display:flex;
+  justify-content: space-between;
+  align-items:flex-start;
+  gap: 12px;
+}
+
+.brandPill,
+.statusPill{
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: rgba(24,18,14,.26); /* lighter */
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 18px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 26px rgba(0,0,0,.22);
+}
+
+.brandName{
+  letter-spacing: .36em;
+  font-weight: 750;
+  font-size: 13px;
+}
+.brandTag{
+  margin-top: 2px;
+  color: rgba(255,255,255,.72);
+  font-size: 12px;
+}
+
+.statusPill{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 10px 14px;
+  color: rgba(255,255,255,.82);
+  font-size: 14px;
+}
+
+.dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(60,255,190,.70);
+  box-shadow: 0 0 0 4px rgba(60,255,190,.14);
+}
+
+/* =========================
+   HERO CENTER TITLE
+   ========================= */
+.heroCenter{
+  width: min(980px, 92vw);
+  margin: 18px auto 14px;
+  text-align:center;
+}
+
+.heroTitle{
+  margin: 14px 0 4px;
+  font-size: clamp(44px, 6vw, 64px);
+  font-weight: 850;
+  letter-spacing: .01em;
+  text-shadow: 0 10px 36px rgba(0,0,0,.38);
+}
+.heroSub{
+  margin: 0;
+  color: rgba(255,255,255,.74);
+  font-size: clamp(16px, 2vw, 20px);
+  text-shadow: 0 8px 22px rgba(0,0,0,.28);
+}
+
+/* =========================
+   MAIN PANEL (GLASS)
+   ========================= */
+.panel{
+  width: min(980px, 92vw);
+  margin: 16px auto 28px;
+  padding: 22px;
+
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--glassA), var(--glassB));
+  border: 1px solid var(--stroke);
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+
+  box-shadow: var(--shadow);
+  overflow:hidden;
+  position: relative;
+}
+
+/* Warm inner glow (slightly lighter) */
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius: inherit;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 420px at 20% 10%, rgba(255,220,160,.18), transparent 62%),
+    radial-gradient(800px 420px at 85% 12%, rgba(255,255,255,.12), transparent 62%);
+}
+.panel::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius: inherit;
+  pointer-events:none;
+  box-shadow: var(--inner);
+}
+.panel > *{ position: relative; z-index: 1; }
+
+.panelTitle{
+  font-size: clamp(38px, 4.2vw, 54px);
+  font-weight: 900;
+  margin: 2px 0 18px;
+  letter-spacing: .01em;
+  text-shadow: 0 10px 22px rgba(0,0,0,.30);
+}
+
+/* =========================
+   VIBE GRID
+   ========================= */
+.vibeGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 18px;
+}
+
+.vibe{
+  appearance:none;
+  border: 1px solid rgba(255,255,255,.18);
+  background: linear-gradient(180deg, var(--btnA), var(--btnB));
+  color: rgba(255,255,255,.92);
+  border-radius: 999px;
+  padding: 18px 18px;
+  font-size: 18px;
+  font-weight: 720;
+  cursor:pointer;
+  box-shadow: 0 10px 22px rgba(0,0,0,.18);
+  transition: transform .12s ease, border-color .12s ease, filter .12s ease;
+}
+
+.vibe:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,.24);
+}
+.vibe:active{ transform: translateY(0) scale(.99); }
+
+.vibe.active{
+  background: linear-gradient(180deg, rgba(255,220,170,.20), rgba(12,10,8,.18));
+  border-color: var(--selStroke);
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.22),
+    0 0 0 1px rgba(255,220,170,.10) inset;
+}
+
+/* =========================
+   ACTION GRID
+   ========================= */
+.actionGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.action{
+  appearance:none;
+  border: 1px solid rgba(255,255,255,.16);
+  background: linear-gradient(180deg, rgba(0,0,0,.26), rgba(0,0,0,.14));
+  border-radius: 18px;
+  padding: 18px 16px;
+  text-align:left;
+  line-height: 1.05;
+  font-size: 17px;
+  font-weight: 800;
+  color: rgba(255,255,255,.92);
+  cursor:pointer;
+  box-shadow: 0 12px 26px rgba(0,0,0,.18);
+  transition: transform .12s ease, border-color .12s ease;
+}
+
+.action:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,.22);
+}
+.action:active{ transform: translateY(0) scale(.99); }
+
+/* =========================
+   MICRO LINE
+   ========================= */
+.microLine{
+  margin: 14px 0 16px;
+  text-align:center;
+  color: rgba(255,255,255,.62);
+  font-size: 15px;
+}
+
+/* =========================
+   PEOPLE CARD
+   ========================= */
+.peopleCard{
+  margin-top: 12px;
+  border-radius: var(--radius2);
+  background: rgba(0,0,0,.18); /* lighter */
+  border: 1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 16px 40px rgba(0,0,0,.22);
+
+  padding: 18px;
+  display:grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 12px 14px;
+  align-items:center;
+}
+
+.peopleTitle{
+  font-size: 44px;
+  font-weight: 900;
+  line-height: .95;
+}
+
+.peopleBtns{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pillBtn{
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.14); /* lighter */
+  color: rgba(255,255,255,.92);
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 850;
+  cursor:pointer;
+  box-shadow: 0 10px 20px rgba(0,0,0,.14);
+  transition: transform .12s ease, border-color .12s ease;
+}
+
+.pillBtn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,.24);
+}
+.pillBtn:active{ transform: translateY(0) scale(.99); }
+
+.peopleNote{
+  grid-column: 1 / -1;
+  color: rgba(255,255,255,.68);
+  font-size: 14px;
+}
+
+.safeBottom{ height: 18px; }
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+@media (max-width: 520px){
+  .heroTop{ margin-top: 14px; }
+  .panel{ padding: 18px; }
+
+  .vibeGrid{ gap: 14px; }
+  .vibe{ padding: 16px; font-size: 17px; }
+
+  .actionGrid{ gap: 12px; }
+  .action{ padding: 16px 14px; font-size: 16px; }
+
+  .peopleTitle{ font-size: 40px; }
+  .peopleCard{ padding: 16px; }
+}
+
+@media (min-width: 900px){
+  .panel{ width: min(1080px, 92vw); padding: 26px; }
+  .vibe{ padding: 20px 18px; font-size: 19px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ transition:none !important; }
+}
