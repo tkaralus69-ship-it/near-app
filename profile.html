@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near — Me</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .page{
+      min-height: 100svh;
+      min-height: 100vh;
+      background:
+        radial-gradient(1200px 800px at 50% 18%, rgba(255,255,255,.10), transparent 55%),
+        linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.72) 100%),
+        url("img/hero.jpg") center top/cover no-repeat;
+      padding-bottom: 24px;
+    }
+    .top{ padding: 14px 16px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .wrap{ width:min(560px,92vw); margin:0 auto; }
+    .panel{
+      margin-top: 10px;
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.55);
+      overflow:hidden;
+    }
+    .head{ padding: 18px 18px 10px; }
+    .head h1{ margin:0; font-size: clamp(34px, 7vw, 44px); }
+    .sub{ padding: 0 18px 14px; color: rgba(255,255,255,.72); font-size: 14px; line-height: 1.35; }
+    .card{
+      margin: 0 18px 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.10);
+      backdrop-filter: blur(16px);
+      padding: 14px;
+      display:flex;
+      gap: 12px;
+      align-items:center;
+    }
+    .avatar{ width: 54px; height: 54px; border-radius: 16px; object-fit: cover; object-position:center top; border:1px solid rgba(255,255,255,.18); background: rgba(0,0,0,.25); }
+    .meta{ flex:1; min-width:0; }
+    .name{ font-weight: 850; margin:0; font-size: 18px; }
+    .bio{ margin:6px 0 0; color: rgba(255,255,255,.80); font-size: 14px; line-height: 1.25; }
+    .town{ margin-top: 8px; font-size: 12px; letter-spacing:.18em; opacity:.85; }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="top">
+      <button class="pillBtn" onclick="window.location.href='index.html'">← Home</button>
+      <div style="display:flex; gap:10px;">
+        <button class="pillBtn" onclick="window.location.href='create.html'">Create</button>
+        <button class="pillBtn" id="btnLogout">Log out</button>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="panel">
+        <div class="head">
+          <h1>Me</h1>
+        </div>
+
+        <div class="sub" id="status">Loading your latest profile…</div>
+
+        <div class="card" id="profileCard" style="display:none;">
+          <img class="avatar" id="avatar" alt="" />
+          <div class="meta">
+            <p class="name" id="name"></p>
+            <p class="bio" id="bio"></p>
+            <div class="town" id="town"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="profile.js"></script>
+</body>
+</html>
