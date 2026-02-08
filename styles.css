@@ -1,0 +1,236 @@
+/* =========================
+   NEAR — styles.css (FULL)
+   ========================= */
+
+/* ---------- Root ---------- */
+:root{
+  --glass: rgba(10,14,20,.42);
+  --glass-soft: rgba(10,14,20,.30);
+  --stroke: rgba(255,255,255,.18);
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.70);
+  --shadow: 0 18px 60px rgba(0,0,0,.55);
+  --radius: 26px;
+  --pill: 999px;
+}
+
+/* ---------- Reset ---------- */
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  color: var(--text);
+  background:#05070d;
+  -webkit-font-smoothing: antialiased;
+  overflow-x:hidden;
+}
+
+/* ---------- Hero ---------- */
+.hero{
+  min-height:100svh;
+  position:relative;
+  display:flex;
+  justify-content:center;
+  padding: clamp(16px,4vw,32px);
+  background:
+    radial-gradient(1200px 800px at 50% 18%, rgba(255,255,255,.10), transparent 55%),
+    linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 55%, rgba(0,0,0,.72) 100%),
+    url("img/hero.jpg") center/cover no-repeat;
+}
+
+/* ---------- Top ---------- */
+.heroTop{
+  position:absolute;
+  top:16px;
+  left:16px;
+  right:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  z-index:5;
+}
+
+.brandPill{
+  padding:10px 14px;
+  border-radius:18px;
+  background:rgba(0,0,0,.28);
+  border:1px solid rgba(255,255,255,.10);
+  backdrop-filter:blur(12px);
+}
+.brandName{
+  letter-spacing:.28em;
+  font-size:14px;
+  font-weight:700;
+}
+.brandTag{
+  font-size:13px;
+  opacity:.75;
+}
+
+.statusPill{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.14);
+  backdrop-filter:blur(12px);
+  font-size:14px;
+  white-space:nowrap;
+}
+.statusPill .dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#3bb8ff;
+  opacity:.25;
+}
+
+/* ---------- Center title ---------- */
+.heroCenter{
+  margin-top:80px;
+  text-align:center;
+  z-index:2;
+}
+.heroTitle{
+  margin:0;
+  font-size:clamp(56px,9vw,66px);
+  font-weight:800;
+  line-height:1;
+  text-shadow:0 10px 40px rgba(0,0,0,.55);
+}
+.heroSub{
+  margin-top:8px;
+  font-size:16px;
+  color:var(--muted);
+}
+
+/* ---------- Main panel ---------- */
+.panel{
+  width:100%;
+  max-width:680px;
+  margin:26px auto 0;
+  padding:16px;
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,.16);
+  background:var(--glass);
+  backdrop-filter:blur(14px);
+  box-shadow:var(--shadow);
+}
+
+.panelTitle{
+  margin:0 0 14px;
+  font-size:clamp(30px,6.2vw,42px);
+  font-weight:800;
+}
+
+/* ---------- Vibes ---------- */
+.vibeGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.vibe{
+  border:1px solid rgba(255,255,255,.22);
+  background:rgba(0,0,0,.22);
+  backdrop-filter:blur(12px);
+  border-radius:var(--pill);
+  padding:16px;
+  font-size:18px;
+  font-weight:700;
+  color:var(--text);
+  cursor:pointer;
+  transition:transform .15s ease, background .2s ease, box-shadow .2s ease;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+.vibe:active{ transform:scale(.98); }
+.vibe.active{
+  background:rgba(255,255,255,.18);
+  box-shadow:0 16px 50px rgba(0,0,0,.40);
+}
+
+/* ---------- Actions ---------- */
+.actionGrid{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+}
+
+.action{
+  min-height:74px;
+  border-radius:20px;
+  padding:14px 12px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(0,0,0,.22);
+  backdrop-filter:blur(12px);
+  color:var(--text);
+  font-size:15px;
+  font-weight:750;
+  text-align:left;
+  cursor:pointer;
+  box-shadow:0 12px 40px rgba(0,0,0,.28);
+}
+
+/* ---------- Micro line ---------- */
+.microLine{
+  margin-top:10px;
+  text-align:center;
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* ---------- People Near ---------- */
+.peopleCard{
+  margin-top:16px;
+  padding:14px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(0,0,0,.22);
+  backdrop-filter:blur(12px);
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px 12px;
+  align-items:center;
+}
+
+.peopleTitle{
+  font-size:34px;
+  font-weight:900;
+  line-height:.95;
+}
+
+.peopleBtns{
+  display:flex;
+  gap:8px;
+}
+
+.pillBtn{
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.12);
+  color:var(--text);
+  font-weight:800;
+  cursor:pointer;
+}
+
+.peopleNote{
+  grid-column:1 / -1;
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* ---------- Safe bottom ---------- */
+.safeBottom{
+  height:32px;
+}
+
+/* ---------- Desktop polish ---------- */
+@media (min-width:768px){
+  .panel{ max-width:720px; }
+}
