@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near — Chat</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <main class="chatHero" id="chatHero">
+
+    <!-- Top -->
+    <div class="chatTop">
+      <button class="pillBtn" onclick="history.back()">← Back</button>
+      <div class="pillBtn">Chat</div>
+    </div>
+
+    <!-- Messages -->
+    <section class="messages" id="messages"></section>
+
+    <!-- Composer -->
+    <div class="composer">
+      <input
+        class="input"
+        id="msgInput"
+        placeholder="Say something…"
+        autocomplete="off"
+      />
+      <button class="send" id="sendBtn">Send</button>
+    </div>
+
+  </main>
+
+  <script type="module" src="chat.js"></script>
+</body>
+</html>
