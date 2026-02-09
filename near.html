@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near — People Near</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <main class="hero" id="hero">
+    <div class="top">
+      <button class="pill" id="backBtn" type="button">← Back</button>
+
+      <div class="badge">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Location off</span>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <section class="panel">
+        <h1 class="panelTitle" style="margin-bottom:10px;">People Near</h1>
+
+        <div style="color:rgba(255,255,255,.78); font-size:14px; line-height:1.35; margin-bottom:14px;">
+          Near only asks for location when you want to see people nearby.<br/>
+          Distances are shown as a minimum of <b>5 km</b> for privacy.
+        </div>
+
+        <button class="action primary" id="enableBtn" type="button" style="width:100%; text-align:center;">
+          Enable location
+        </button>
+
+        <div id="peopleList" style="display:none; margin-top:14px;">
+          <div style="border:1px solid rgba(255,255,255,.14); background:rgba(0,0,0,.22); border-radius:22px; padding:14px;">
+            <b style="display:block; font-size:16px; margin-bottom:6px;">Near is ready.</b>
+            <div style="opacity:.78;">Location enabled. Nearby profiles will appear here.</div>
+          </div>
+        </div>
+
+        <div class="note" style="margin-top:16px;">No pressure. You’re in control.</div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const hero = document.getElementById("hero");
+
+    const enableBtn  = document.getElementById("enableBtn");
+    const peopleList = document.getElementById("peopleList");
+    const statusText = document.getElementById("statusText");
+    const statusDot  = document.getElementById("statusDot");
+
+    const vibeImages = {
+      city: "city.jpg",
+      tech: "tech.jpg",
+      nature: "nature.jpg",
+      fitness: "fitness.jpg",
+      beach: "beach.jpg",
+      food: "food.jpg",
+    };
+
+    function applyVibeBg(){
+      const vibe = localStorage.getItem("near_vibe") || "nature";
+      hero.style.backgroundImage =
+        `linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.28)),
+         url("img/${vibeImages[vibe] || "hero.jpg"}")`;
+    }
+
+    function setStatus(on){
+      statusText.textContent = on ? "Location on" : "Location off";
+      statusDot.style.opacity = on ? "1" : ".35";
+    }
+
+    function showEnabledUI(){
+      enableBtn.style.display = "none";
+      peopleList.style.display = "block";
+    }
+
+    // Back
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    // Restore background + state
+    applyVibeBg();
+
+    const locOn = localStorage.getItem("near_loc_on") === "1";
+    setStatus(locOn);
+    if (locOn) showEnabledUI();
+
+    enableBtn.addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        alert("This device/browser doesn't support location.");
+        return;
+      }
+
+      enableBtn.textContent = "Requesting…";
+
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          localStorage.setItem("near_loc_on", "1");
+          setStatus(true);
+          showEnabledUI();
+        },
+        (err) => {
+          console.log(err);
+          enableBtn.textContent = "Enable location";
+          alert("No worries — you can enable location anytime.");
+          setStatus(false);
+        },
+        { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 }
+      );
+    });
+  </script>
+</body>
+</html>
