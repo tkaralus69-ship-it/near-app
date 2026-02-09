@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near — Real people</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <main class="hero" id="hero">
+    <div class="top">
+      <div class="brand">
+        <div class="logo">N E A R</div>
+        <div class="tag">nearest &amp; dearest</div>
+      </div>
+
+      <div class="badge" id="statusPill">
+        <span class="dot" id="locDot"></span>
+        <span id="vibeText">Vibe: city · Location off</span>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <h1 class="title">Near</h1>
+      <p class="subtitle">Real people. Near you. Live.</p>
+
+      <!-- Smaller glass only (no giant smoke window) -->
+      <section class="panel">
+        <h2 class="panelTitle">Choose your vibe</h2>
+
+        <div class="vibes" id="vibeGrid">
+          <button class="vibe" type="button" data-vibe="city">City</button>
+          <button class="vibe" type="button" data-vibe="tech">Tech</button>
+          <button class="vibe" type="button" data-vibe="nature">Nature</button>
+          <button class="vibe" type="button" data-vibe="fitness">Fitness</button>
+          <button class="vibe" type="button" data-vibe="beach">Beach</button>
+          <button class="vibe" type="button" data-vibe="food">Food</button>
+        </div>
+
+        <div class="actions">
+          <button class="action primary" id="btnNear" type="button">Choose<br>someone<br>Near</button>
+          <button class="action" id="btnWave" type="button">Send a<br>Wave</button>
+          <button class="action" id="btnLive" type="button">Live<br>Waves</button>
+        </div>
+
+        <p class="note">Location is only used when you ask for it.</p>
+      </section>
+
+      <section class="panel">
+        <div class="peopleRow">
+          <h2 class="peopleTitle">People Near</h2>
+
+          <div class="peopleActions">
+            <button class="pill primary" id="btnCreate" type="button">Create</button>
+            <button class="pill" id="btnMe" type="button">Me</button>
+          </div>
+        </div>
+
+        <p class="note">Distances shown as a minimum of <b>5 km</b> for privacy.</p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const hero = document.getElementById("hero");
+    const vibeText = document.getElementById("vibeText");
+    const locDot = document.getElementById("locDot");
+
+    const vibeImages = {
+      city: "city.jpg",
+      tech: "tech.jpg",
+      nature: "nature.jpg",
+      fitness: "fitness.jpg",
+      beach: "beach.jpg",
+      food: "food.jpg",
+    };
+
+    function isLocOn(){ return localStorage.getItem("near_loc_on") === "1"; }
+
+    function applyVibe(vibe) {
+      localStorage.setItem("near_vibe", vibe);
+      hero.style.backgroundImage =
+        `linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.28)),
+         url("img/${vibeImages[vibe] || "hero.jpg"}")`;
+
+      const loc = isLocOn() ? "Location on" : "Location off";
+      vibeText.textContent = `Vibe: ${vibe} · ${loc}`;
+      locDot.style.opacity = isLocOn() ? "1" : ".35";
+    }
+
+    // Restore
+    applyVibe(localStorage.getItem("near_vibe") || "nature");
+
+    // Vibe clicks
+    document.querySelectorAll(".vibe").forEach(btn => {
+      btn.addEventListener("click", () => applyVibe(btn.dataset.vibe));
+    });
+
+    // IMPORTANT buttons (now wired)
+    document.getElementById("btnNear").addEventListener("click", () => {
+      window.location.href = "near.html";
+    });
+
+    document.getElementById("btnCreate").addEventListener("click", () => {
+      window.location.href = "create.html";
+    });
+
+    document.getElementById("btnMe").addEventListener("click", () => {
+      window.location.href = "profile.html";
+    });
+
+    // placeholders
+    document.getElementById("btnWave").addEventListener("click", () => alert("Soon: send a wave 👋"));
+    document.getElementById("btnLive").addEventListener("click", () => alert("Soon: live waves 🌊"));
+  </script>
+</body>
+</html>
