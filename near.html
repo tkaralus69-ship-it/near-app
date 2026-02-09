@@ -6,7 +6,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#0b1220" />
   <link rel="stylesheet" href="styles.css" />
+const locOn = localStorage.getItem("near_loc_on") === "1";
 
+if (locOn) {
+  setStatus(true, "Location on");
+  enableBtn.style.display = "none";
+  peopleList.style.display = "grid";
+}
   <style>
     .hero{
       min-height: 100vh;
