@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Near — Privacy</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .wrap{ width:min(820px,92vw); margin: 0 auto; padding: 26px 0 34px; }
+    .panel{ padding: 22px; }
+    h1{ margin: 0 0 10px; font-size: clamp(28px, 4vw, 40px); }
+    h2{ margin: 22px 0 10px; font-size: 18px; letter-spacing:.01em; }
+    p, li{ color: rgba(255,255,255,.78); line-height: 1.6; }
+    ul{ padding-left: 18px; }
+    .topRow{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom: 12px; }
+    .pill{ border:1px solid rgba(255,255,255,.18); background: rgba(0,0,0,.18); color: rgba(255,255,255,.92);
+      padding: 10px 16px; border-radius: 999px; font-weight: 850; cursor:pointer; }
+    .small{ font-size: 13px; color: rgba(255,255,255,.62); }
+    .hr{ height:1px; background: rgba(255,255,255,.10); margin: 18px 0; }
+    a{ color: rgba(120,190,255,.92); }
+    .notice{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.16);
+      border-radius: 22px;
+      padding: 14px;
+      color: rgba(255,255,255,.78);
+    }
+  </style>
+</head>
+
+<body>
+  <main class="hero" id="hero">
+    <div class="top" style="align-items:center;">
+      <button class="pill" type="button" onclick="window.location.href='index.html'">← Home</button>
+      <div class="badge" style="gap:10px;">
+        <span class="dot" style="opacity:.8;"></span>
+        Privacy
+      </div>
+    </div>
+
+    <div class="wrap">
+      <section class="panel">
+        <div class="topRow">
+          <div>
+            <h1>Privacy Policy</h1>
+            <div class="small">Last updated: <span id="lastUpdated"></span></div>
+          </div>
+        </div>
+
+        <div class="notice">
+          <b>Near is built for connection, not extraction.</b><br/>
+          We only use location when you ask (for “People Near”), and we aim to collect the minimum data needed for the app to work.
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>What Near collects</h2>
+        <ul>
+          <li><b>Account info:</b> if you sign in by email, Firebase Authentication stores your email to identify your account.</li>
+          <li><b>Profile info you choose to share:</b> name, age, bio, town/city, and optional photo link (or photo) that you provide.</li>
+          <li><b>Location (only when you ask):</b> used to show “People Near”. We show distances with a <b>5 km minimum</b> for privacy.</li>
+          <li><b>Basic technical data:</b> standard logs/security data provided by hosting and Firebase to keep the service reliable and secure.</li>
+        </ul>
+
+        <h2>What Near does <u>not</u> do</h2>
+        <ul>
+          <li>No selling your personal data.</li>
+          <li>No “data broker” sharing.</li>
+          <li>No forced location access on landing.</li>
+          <li>No hidden scraping of your contacts.</li>
+        </ul>
+
+        <h2>How we use data</h2>
+        <ul>
+          <li>To let you create and view your profile across devices.</li>
+          <li>To show nearby profiles when you enable location.</li>
+          <li>To prevent abuse, keep accounts secure, and improve stability.</li>
+        </ul>
+
+        <h2>Location & privacy floor</h2>
+        <p>
+          Near requests location only when you tap “Enable location” on the People Near page.
+          Distances are displayed as a minimum of <b>5 km</b> to reduce precise tracking.
+        </p>
+
+        <h2>Promotional emails</h2>
+        <p>
+          Near may offer an <b>optional</b> checkbox for updates/promos. If you opt in, you can opt out anytime using the unsubscribe link or by emailing us.
+        </p>
+
+        <h2>Third-party services</h2>
+        <p>
+          Near uses Firebase (Google) for authentication and database/storage. Firebase may process data on our behalf to provide the service.
+        </p>
+
+        <h2>Data retention</h2>
+        <p>
+          We keep your account/profile data while you use Near. You can request deletion at any time.
+        </p>
+
+        <h2>Security</h2>
+        <p>
+          We use Firebase security rules and access controls to protect data. No system is perfect, but we design for safety and minimum collection.
+        </p>
+
+        <h2>Your choices</h2>
+        <ul>
+          <li>Don’t share info you don’t want public.</li>
+          <li>Turn location on only when needed.</li>
+          <li>Request profile/account deletion.</li>
+        </ul>
+
+        <h2>Contact</h2>
+        <p>
+          Email: <a href="mailto:Nearpeopleb4profit@gmail.com">Nearpeopleb4profit@gmail.com</a>
+        </p>
+
+        <div class="hr"></div>
+        <p class="small">
+          This policy will evolve as Near grows. We’ll keep it clear, human, and privacy-first.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // keep background consistent with vibe
+    const hero = document.getElementById("hero");
+    const vibe = localStorage.getItem("near_vibe") || "nature";
+    const vibeImages = { city:"city.jpg", tech:"tech.jpg", nature:"nature.jpg", fitness:"fitness.jpg", beach:"beach.jpg", food:"food.jpg" };
+    hero.style.backgroundImage =
+      `linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.28)),
+       url("img/${vibeImages[vibe] || "hero.jpg"}")`;
+
+    // date
+    const d = new Date();
+    const opts = { year: "numeric", month: "long", day: "numeric" };
+    document.getElementById("lastUpdated").textContent = d.toLocaleDateString(undefined, opts);
+  </script>
+</body>
+</html>
