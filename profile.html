@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NEAR Radar</title>
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg1: #040816;
+    --bg2: #0b1430;
+    --card: rgba(255,255,255,0.06);
+    --card-border: rgba(255,255,255,0.08);
+    --text: #f5f7fb;
+    --muted: rgba(255,255,255,0.66);
+    --soft: rgba(255,255,255,0.5);
+    --glow: rgba(126, 168, 255, 0.35);
+  }
+
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at top, rgba(120,140,255,0.10), transparent 28%),
+      radial-gradient(circle at 50% 30%, rgba(255,255,255,0.04), transparent 35%),
+      linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+    min-height: 100vh;
+  }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 110px;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 16px 18px 14px;
+    backdrop-filter: blur(18px);
+    background: rgba(4, 8, 22, 0.78);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .logo {
+    font-size: 1.35rem;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+  }
+
+  .tag {
+    font-size: 0.84rem;
+    color: var(--muted);
+  }
+
+  .gear-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.09);
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+    color: white;
+    font-size: 1.15rem;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+  }
+
+  .screen {
+    padding: 18px;
+  }
+
+  .card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.035));
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.28);
+  }
+
+  .hero {
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+
+  .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(76, 217, 100, 0.12);
+    color: #95f0ab;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    margin-bottom: 14px;
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #4cd964;
+    box-shadow: 0 0 12px #4cd964;
+  }
+
+  .hero-title {
+    margin: 0 0 8px;
+    font-size: 1.55rem;
+    line-height: 1.14;
+    font-weight: 850;
+  }
+
+  .hero-sub {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.48;
+    font-size: 0.94rem;
+  }
+
+  .hero-stats {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .stat {
+    border-radius: 20px;
+    padding: 14px 10px;
+    text-align: center;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .stat-value {
+    font-size: 1.08rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--soft);
+  }
+
+  .radar-card {
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    margin: 0;
+    font-size: 1.02rem;
+    font-weight: 850;
+  }
+
+  .section-sub {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .radar-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 4px;
+  }
+
+  .radar {
+    position: relative;
+    width: 290px;
+    height: 290px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 42%, rgba(255,255,255,0.008) 68%, transparent 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    box-shadow:
+      inset 0 0 80px rgba(126,168,255,0.05),
+      0 10px 35px rgba(0,0,0,0.18);
+  }
+
+  .ring {
+    position: absolute;
+    border: 1px solid rgba(255,255,255,0.11);
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .ring-1 { width: 80px; height: 80px; }
+  .ring-2 { width: 150px; height: 150px; }
+  .ring-3 { width: 220px; height: 220px; }
+  .ring-4 { width: 290px; height: 290px; }
+
+  .cross-h,
+  .cross-v {
+    position: absolute;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .cross-h {
+    height: 1px;
+    width: 100%;
+    top: 50%;
+    left: 0;
+  }
+
+  .cross-v {
+    width: 1px;
+    height: 100%;
+    left: 50%;
+    top: 0;
+  }
+
+  .sweep {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    left: 50%;
+    top: 50%;
+    transform-origin: 0% 0%;
+    background: linear-gradient(90deg, rgba(126,168,255,0.18), rgba(126,168,255,0.01));
+    animation: sweep 5s linear infinite;
+    filter: blur(1px);
+  }
+
+  @keyframes sweep {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .center-ping {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    box-shadow: 0 0 24px rgba(255,255,255,0.55);
+    z-index: 3;
+  }
+
+  .blip {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffffff, #9bc0ff);
+    box-shadow: 0 0 20px rgba(155,192,255,0.7);
+    z-index: 4;
+  }
+
+  .blip::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.20);
+  }
+
+  .blip.one   { left: 66%; top: 28%; }
+  .blip.two   { left: 28%; top: 61%; }
+  .blip.three { left: 58%; top: 68%; }
+  .blip.four  { left: 35%; top: 28%; }
+
+  .radar-note {
+    margin-top: 14px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .people-section {
+    margin-bottom: 18px;
+  }
+
+  .people-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .person-card {
+    display: flex;
+    gap: 14px;
+    padding: 14px;
+    align-items: center;
+  }
+
+  .avatar {
+    width: 82px;
+    height: 82px;
+    border-radius: 24px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #233664, #5874b9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .person-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .person-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .person-name {
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  .distance {
+    white-space: nowrap;
+    font-size: 0.76rem;
+    color: rgba(255,255,255,0.86);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 6px 9px;
+    border-radius: 999px;
+  }
+
+  .person-bio {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.45;
+    margin-bottom: 12px;
+  }
+
+  .action-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    border: 0;
+    border-radius: 14px;
+    padding: 11px 14px;
+    font-weight: 800;
+    cursor: pointer;
+    font-size: 0.88rem;
+  }
+
+  .btn-pass {
+    background: rgba(255,255,255,0.07);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.06);
+    flex: 1;
+  }
+
+  .btn-like {
+    background: linear-gradient(135deg, #ffffff, #bad2ff);
+    color: #09101f;
+    flex: 1;
+    box-shadow: 0 10px 24px rgba(186,210,255,0.16);
+  }
+
+  .bottom-nav {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 14px;
+    width: min(440px, calc(100% - 24px));
+    padding: 10px;
+    border-radius: 26px;
+    background: rgba(7, 12, 25, 0.92);
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.34);
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .nav-btn {
+    min-height: 58px;
+    border: 0;
+    border-radius: 18px;
+    background: transparent;
+    color: rgba(255,255,255,0.72);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    align-items: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .nav-btn .icon {
+    font-size: 1.1rem;
+  }
+
+  .nav-btn.me {
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.045));
+    border: 1px solid rgba(255,255,255,0.07);
+    color: white;
+  }
+
+  .nav-btn.create {
+    position: relative;
+    background: linear-gradient(135deg, #ffffff, #c7d9ff 55%, #a8c4ff);
+    color: #09101f;
+    font-weight: 900;
+    box-shadow:
+      0 12px 28px rgba(160,190,255,0.22),
+      0 0 0 1px rgba(255,255,255,0.35) inset;
+    overflow: hidden;
+  }
+
+  .nav-btn.create::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.55) 50%, transparent 80%);
+    transform: translateX(-130%);
+    animation: shine 3.4s linear infinite;
+  }
+
+  @keyframes shine {
+    to { transform: translateX(130%); }
+  }
+
+  .nav-btn.active {
+    color: white;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  @media (max-width: 380px) {
+    .radar { width: 250px; height: 250px; }
+    .ring-1 { width: 70px; height: 70px; }
+    .ring-2 { width: 128px; height: 128px; }
+    .ring-3 { width: 190px; height: 190px; }
+    .ring-4 { width: 250px; height: 250px; }
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="top-row">
+        <div class="brand">
+          <div class="logo">NEAR</div>
+          <div class="tag">Radar for real people nearby</div>
+        </div>
+        <button class="gear-btn">⚙️</button>
+      </div>
+    </header>
+
+    <main class="screen">
+      <section class="card hero">
+        <div class="live-pill">
+          <span class="dot"></span>
+          Live location active
+        </div>
+
+        <h1 class="hero-title">Who’s around you right now?</h1>
+        <p class="hero-sub">
+          NEAR shows people who are actually nearby. No fake distance. No noise. Just real local connection.
+        </p>
+
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-value" id="nearbyCount">4</div>
+            <div class="stat-label">Nearby</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">5 km</div>
+            <div class="stat-label">Range</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">Now</div>
+            <div class="stat-label">Live</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card radar-card">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">NEAR Radar</h2>
+            <div class="section-sub">You are in the centre</div>
+          </div>
+        </div>
+
+        <div class="radar-wrap">
+          <div class="radar">
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-3"></div>
+            <div class="ring ring-4"></div>
+            <div class="cross-h"></div>
+            <div class="cross-v"></div>
+            <div class="sweep"></div>
+            <div class="center-ping"></div>
+
+            <div class="blip one" title="Mia"></div>
+            <div class="blip two" title="Jay"></div>
+            <div class="blip three" title="Aria"></div>
+            <div class="blip four" title="Sienna"></div>
+          </div>
+        </div>
+
+        <div class="radar-note">
+          4 people detected within your current discovery range
+        </div>
+      </section>
+
+      <section class="people-section">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Nearby now</h2>
+            <div class="section-sub">Closest first</div>
+          </div>
+        </div>
+
+        <div class="people-list" id="peopleList">
+          <div class="card person-card">
+            <div class="avatar">🌊</div>
+            <div class="person-main">
+              <div class="person-top">
+                <div class="person-name">Mia, 27</div>
+                <div class="distance">420m away</div>
+              </div>
+              <div class="person-bio">
+                Beach walks, honest energy, and good coffee. Here for something real.
+              </div>
+              <div class="action-row">
+                <button class="btn btn-pass">Pass</button>
+                <button class="btn btn-like">Like</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card person-card">
+            <div class="avatar">🌙</div>
+            <div class="person-main">
+              <div class="person-top">
+                <div class="person-name">Jay, 31</div>
+                <div class="distance">1.2km away</div>
+              </div>
+              <div class="person-bio">
+                Music, late drives, grounded conversation, and good humour.
+              </div>
+              <div class="action-row">
+                <button class="btn btn-pass">Pass</button>
+                <button class="btn btn-like">Like</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card person-card">
+            <div class="avatar">✨</div>
+            <div class="person-main">
+              <div class="person-top">
+                <div class="person-name">Aria, 29</div>
+                <div class="distance">2.1km away</div>
+              </div>
+              <div class="person-bio">
+                Warm, playful, and into art, nature, and real connection.
+              </div>
+              <div class="action-row">
+                <button class="btn btn-pass">Pass</button>
+                <button class="btn btn-like">Like</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card person-card">
+            <div class="avatar">🔥</div>
+            <div class="person-main">
+              <div class="person-top">
+                <div class="person-name">Sienna, 25</div>
+                <div class="distance">3.8km away</div>
+              </div>
+              <div class="person-bio">
+                Big laugh, strong vibe, spontaneous plans. Open to seeing what happens.
+              </div>
+              <div class="action-row">
+                <button class="btn btn-pass">Pass</button>
+                <button class="btn btn-like">Like</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn me">
+      <span class="icon">👤</span>
+      <span>Me</span>
+    </button>
+
+    <button class="nav-btn create">
+      <span class="icon">✦</span>
+      <span>Create</span>
+    </button>
+
+    <button class="nav-btn active">
+      <span class="icon">📍</span>
+      <span>Radar</span>
+    </button>
+  </nav>
+
+  <script>
+    const likeButtons = document.querySelectorAll(".btn-like");
+    const passButtons = document.querySelectorAll(".btn-pass");
+
+    likeButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        btn.textContent = "Liked ✓";
+        btn.disabled = true;
+      });
+    });
+
+    passButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const card = btn.closest(".person-card");
+        if (card) {
+          card.style.opacity = "0.35";
+          card.style.transform = "scale(0.98)";
+        }
+      });
+    });
+  </script>
+</body>
+</html>
