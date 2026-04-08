@@ -183,3 +183,14 @@
     });
   });
 })();
+<script>
+  firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+      // User is signed in, you can proceed with app content
+      console.log("User signed in:", user.email);
+    } else {
+      // No user signed in, redirect or show sign-in
+      window.location.href = 'auth.html'; // Change this to your sign-in page
+    }
+  });
+</script>
