@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>NEAR Create Profile</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg1: #030817;
+      --bg2: #0a1430;
+      --text: #f5f7fb;
+      --muted: rgba(255,255,255,0.68);
+      --soft: rgba(255,255,255,0.52);
+      --card-border: rgba(255,255,255,0.08);
+      --glass: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.035));
+      --white-btn: linear-gradient(135deg, #ffffff, #dfe8ff 58%, #bfd2ff);
+      --shadow: 0 20px 45px rgba(0,0,0,0.28);
+      --radius-xl: 28px;
+      --live-green: #4cd964;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top, rgba(76,217,100,0.08), transparent 18%),
+        radial-gradient(circle at 50% 32%, rgba(255,255,255,0.03), transparent 34%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 120px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      padding: 18px 18px 14px;
+      backdrop-filter: blur(18px);
+      background: rgba(3, 8, 22, 0.78);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .logo {
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+    }
+
+    .tag {
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .back-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: var(--glass);
+      color: white;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+    }
+
+    .screen {
+      padding: 18px;
+    }
+
+    .card {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .hero {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .photo-wrap {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 14px;
+    }
+
+    .photo {
+      width: 120px;
+      height: 120px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, #314a88, #6785ce);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .photo-btn {
+      position: absolute;
+      right: -4px;
+      bottom: -4px;
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 14px;
+      background: white;
+      color: #09101f;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+    }
+
+    .hero-title {
+      font-size: 1.35rem;
+      font-weight: 850;
+      margin: 0 0 6px;
+    }
+
+    .hero-sub {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+
+    .section {
+      padding: 16px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 850;
+      margin: 0 0 14px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .label {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .input,
+    .textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: white;
+      border-radius: 16px;
+      padding: 14px;
+      font: inherit;
+      outline: none;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+
+    .textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.86);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: white;
+      color: #09101f;
+    }
+
+    .range-wrap {
+      padding-top: 6px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    .range-value {
+      margin-top: 10px;
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.72);
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .toggle-text {
+      flex: 1;
+    }
+
+    .toggle-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .toggle-sub {
+      font-size: 0.84rem;
+      color: rgba(255,255,255,0.58);
+    }
+
+    .switch {
+      position: relative;
+      width: 56px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      transition: 0.25s;
+      cursor: pointer;
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      left: 4px;
+      top: 4px;
+      border-radius: 50%;
+      background: white;
+      transition: 0.25s;
+    }
+
+    .switch input:checked + .slider {
+      background: rgba(76,217,100,0.55);
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    .save-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: max(14px, env(safe-area-inset-bottom));
+      width: min(440px, calc(100% - 24px));
+      background: rgba(8, 12, 25, 0.92);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      padding: 12px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+      z-index: 50;
+    }
+
+    .save-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 16px;
+      padding: 15px 16px;
+      font-weight: 850;
+      font-size: 0.98rem;
+      cursor: pointer;
+      background: var(--white-btn);
+      color: #09101f;
+    }
+
+    .status {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.84rem;
+      color: rgba(255,255,255,0.64);
+    }
+
+    @media (max-width: 420px) {
+      .row-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="top-row">
+        <div class="brand">
+          <div class="logo">NEAR</div>
+          <div class="tag">Create your profile</div>
+        </div>
+        <button class="back-btn" type="button" onclick="window.location.href='near.html'">←</button>
+      </div>
+    </header>
+
+    <main class="screen">
+      <section class="card hero">
+        <div class="photo-wrap">
+          <div class="photo" id="photoPreview">
+            <span id="photoEmoji">👤</span>
+            <img id="photoImg" alt="Profile photo preview" />
+          </div>
+          <button class="photo-btn" id="uploadBtn" type="button">+</button>
+          <input type="file" id="photoInput" accept="image/*" hidden />
+        </div>
+
+        <h1 class="hero-title">Create your NEAR profile</h1>
+        <p class="hero-sub">
+          Keep it simple, warm, and real. The best profiles feel human.
+        </p>
+      </section>
+
+      <section class="card section">
+        <h2 class="section-title">About you</h2>
+
+        <div class="row-2">
+          <div class="field">
+            <div class="label-row">
+              <label class="label" for="nameInput">Name</label>
+            </div>
+            <input class="input" id="nameInput" type="text" placeholder="Your first name" maxlength="24" />
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label class="label" for="ageInput">Age</label>
+            </div>
+            <input class="input" id="ageInput" type="number" placeholder="Age" min="18" max="99" />
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <label class="label" for="cityInput">City</label>
+          </div>
+          <input class="input" id="cityInput" type="text" placeholder="Your city" maxlength="40" />
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <label class="label" for="bioInput">Bio</label>
+          </div>
+          <textarea class="textarea" id="bioInput" placeholder="Say a little about yourself. Real works better than perfect."></textarea>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2 class="section-title">Your vibe</h2>
+
+        <div class="chips" id="vibeChips">
+          <button class="chip active" type="button" data-value="Calm">Calm</button>
+          <button class="chip" type="button" data-value="Adventurous">Adventurous</button>
+          <button class="chip" type="button" data-value="Romantic">Romantic</button>
+          <button class="chip" type="button" data-value="Grounded">Grounded</button>
+          <button class="chip" type="button" data-value="Playful">Playful</button>
+          <button class="chip" type="button" data-value="Deep">Deep</button>
+        </div>
+
+        <div class="field" style="margin-top:14px;">
+          <div class="label-row">
+            <label class="label" for="statusInput">Status line</label>
+          </div>
+          <input class="input" id="statusInput" type="text" maxlength="50" placeholder="Example: Here for something real" />
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2 class="section-title">Discovery</h2>
+
+        <div class="field">
+          <div class="label-row">
+            <label class="label" for="distanceRange">Distance preference</label>
+            <span class="hint" id="distanceHint">15 km</span>
+          </div>
+          <div class="range-wrap">
+            <input id="distanceRange" type="range" min="5" max="50" value="15" />
+            <div class="range-value">How far away people can be shown to you.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <label class="label" for="ageMin">Preferred age range</label>
+            <span class="hint" id="ageRangeHint">21 - 35</span>
+          </div>
+          <div class="row-2">
+            <input class="input" id="ageMin" type="number" min="18" max="99" value="21" />
+            <input class="input" id="ageMax" type="number" min="18" max="99" value="35" />
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2 class="section-title">Visibility</h2>
+
+        <div class="toggle-row">
+          <div class="toggle-text">
+            <div class="toggle-title">Show my profile</div>
+            <div class="toggle-sub">When off, people nearby won’t see you.</div>
+          </div>
+          <label class="switch">
+            <input id="visibilityToggle" type="checkbox" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="save-bar">
+    <button class="save-btn" id="saveBtn" type="button">Save Profile</button>
+    <div class="status" id="saveStatus">Ready to save</div>
+  </div>
+
+  <script>
+    // Small UI-only helpers for the create page
+    (function () {
+      const uploadBtn = document.getElementById("uploadBtn");
+      const photoInput = document.getElementById("photoInput");
+      const photoImg = document.getElementById("photoImg");
+      const photoEmoji = document.getElementById("photoEmoji");
+      const vibeChips = document.getElementById("vibeChips");
+      const distanceRange = document.getElementById("distanceRange");
+      const distanceHint = document.getElementById("distanceHint");
+      const ageMin = document.getElementById("ageMin");
+      const ageMax = document.getElementById("ageMax");
+      const ageRangeHint = document.getElementById("ageRangeHint");
+
+      function updateDistance() {
+        distanceHint.textContent = `${distanceRange.value} km`;
+      }
+
+      function updateAgeRange() {
+        ageRangeHint.textContent = `${ageMin.value || 18} - ${ageMax.value || 99}`;
+      }
+
+      uploadBtn.addEventListener("click", () => photoInput.click());
+
+      photoInput.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          photoImg.src = reader.result;
+          photoImg.style.display = "block";
+          photoEmoji.style.display = "none";
+        };
+        reader.readAsDataURL(file);
+      });
+
+      vibeChips.querySelectorAll(".chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          vibeChips.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
+          chip.classList.add("active");
+        });
+      });
+
+      distanceRange.addEventListener("input", updateDistance);
+      ageMin.addEventListener("input", updateAgeRange);
+      ageMax.addEventListener("input", updateAgeRange);
+
+      updateDistance();
+      updateAgeRange();
+    })();
+  </script>
+
+  <!-- Firebase compat scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA2ApGkST41s9U53GQIatv4FL8aCPVzeAM",
+      authDomain: "near-c7681.firebaseapp.com",
+      projectId: "near-c7681",
+      storageBucket: "near-c7681.firebasestorage.app",
+      messagingSenderId: "316318833624",
+      appId: "1:316318833624:web:480beb2c1909e23d1cf0ad",
+      measurementId: "G-98XYEKXLLT"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+  </script>
+
+  <script src="create.js"></script>
+</body>
+</html>
