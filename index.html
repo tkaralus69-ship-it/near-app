@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEAR</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: white;
+    }
+
+    header {
+      padding: 16px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      background: #020617;
+    }
+
+    .container {
+      padding: 16px;
+    }
+
+    .hero {
+      height: 220px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-end;
+      padding: 16px;
+      background: #020617;
+    }
+
+    .statusPill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+    }
+
+    .vibes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .vibe {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #1e293b;
+      cursor: pointer;
+    }
+
+    .vibe.active {
+      background: white;
+      color: black;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      background: #1e293b;
+      color: white;
+    }
+
+    button.primary {
+      background: white;
+      color: black;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>NEAR</header>
+
+<div class="container">
+
+  <div id="hero" class="hero">
+    <div>Real people. Near you.</div>
+  </div>
+
+  <div class="statusPill">
+    <div class="dot"></div>
+    <span class="statusText">Vibe: nature • Location off</span>
+  </div>
+
+  <div class="vibes">
+    <div class="vibe">City</div>
+    <div class="vibe">Tech</div>
+    <div class="vibe">Nature</div>
+    <div class="vibe">Fitness</div>
+    <div class="vibe">Beach</div>
+    <div class="vibe">Food</div>
+  </div>
+
+  <button>Choose someone Near</button>
+  <button>Create</button>
+  <button>Me</button>
+  <button>Send a Wave</button>
+  <button>Live Waves</button>
+
+</div>
+
+<!-- 🔥 Firebase (must be BEFORE script.js) -->
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyA2ApGkST41s9U53GQIatv4FL8aCPVzeAM",
+    authDomain: "near-c7681.firebaseapp.com",
+    projectId: "near-c7681",
+    storageBucket: "near-c7681.firebasestorage.app",
+    messagingSenderId: "316318833624",
+    appId: "1:316318833624:web:480beb2c1909e23d1cf0ad",
+    measurementId: "G-98XYEKXLLT"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+<!-- Your main logic -->
+<script src="script.js"></script>
+
+</body>
+</html>
